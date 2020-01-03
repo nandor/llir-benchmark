@@ -1,0 +1,22 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+(executable (name durand_kerner_aberth) (modules durand_kerner_aberth))
+(executable (name fft) (modules fft))
+(executable (name lu_decomposition) (modules lu_decomposition))
+(executable (name qr_decomposition) (modules qr_decomposition))
+
+(executable
+ (name levinson_durbin)
+ (modules levinson_durbin levinson_durbin_dataset))
+(executable
+ (name naive_multilayer)
+ (modules naive_multilayer naive_multilayer_dataset))
+
+(alias (name buildbench)
+ (deps
+   durand_kerner_aberth.exe
+   fft.exe
+   levinson_durbin.exe
+   naive_multilayer.exe
+   lu_decomposition.exe
+   qr_decomposition.exe))

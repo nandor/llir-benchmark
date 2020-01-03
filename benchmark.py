@@ -10,10 +10,9 @@ import json
 
 # List of all packages to install.
 PACKAGES=[
-  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli",
-  "hxd", "rml", "odoc", "ucaml", "ppxfind", "ocamlmod",
-  "camlp4", "menhir", "minilight", "yojson", "lwt",
-  "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes"
+  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc", 
+  "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson", 
+  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes",
 ]
 
 # List of all switches to evaluate.
@@ -197,7 +196,47 @@ class Benchmark(object):
 
 
 BENCHMARKS=[
-  Benchmark(name='bdd', args=['26'])
+  Benchmark(
+    name='bdd', 
+    args=['26']
+  ),
+  Benchmark(
+    name='durand_kerner_aberth',
+    exe='benchmarks/numerical-analysis/durand_kerner_aberth.exe',
+    args=['100']
+  ),
+  Benchmark(
+    name='fft',
+    exe='benchmarks/numerical-analysis/fft.exe',
+    args=['1_048_576']
+  ),
+  Benchmark(
+    name='levinson_durbin',
+    exe='benchmarks/numerical-analysis/levinson_durbin.exe',
+    args=['10_000']
+  ),
+  Benchmark(
+    name='lu_decomposition',
+    exe='benchmarks/numerical-analysis/lu_decomposition.exe',
+  ),
+  Benchmark(
+    name='naive_multilayer',
+    exe='benchmarks/numerical-analysis/naive_multilayer.exe',
+  ),
+  Benchmark(
+    name='qr_decomposition',
+    exe='benchmarks/numerical-analysis/qr_decomposition.exe',
+  ),
+  Benchmark(
+    name='alloc', 
+    exe='benchmarks/simple-tests/alloc.exe', 
+    args=['400_000']
+  ),
+  Benchmark(
+    name='morestacks',
+    exe='benchmarks/simple-tests/morestacks.exe',
+    args=['1_000']
+  ),
 ]
 
 def benchmark_perf():
