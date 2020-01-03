@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index c575afe..a9925f4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -12,7 +12,7 @@ PACKS = bigarray
+ RESULT = camlpdf
+ 
+ LIBINSTALL_FILES = camlpdf.a camlpdf.cma camlpdf.cmxa libcamlpdf_stubs.a \
+-dllcamlpdf_stubs.* $(foreach x,$(PDFMODS),$x.mli)  $(foreach x,$(PDFMODS),$x.cmt) \
++$(foreach x,$(PDFMODS),$x.mli)  $(foreach x,$(PDFMODS),$x.cmt) \
+ $(foreach x,$(PDFMODS),$x.cmi) $(foreach x,$(PDFMODS),$x.cmx)
+ 
+ OCAMLNCFLAGS = -g -safe-string -bin-annot -w -3

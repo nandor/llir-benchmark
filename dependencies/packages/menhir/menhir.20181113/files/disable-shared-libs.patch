@@ -1,0 +1,25 @@
+diff --git a/src/Makefile b/src/Makefile
+index 04d3ff2..64787b8 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -5,11 +5,6 @@ ifndef TARGET
+   TARGET := native
+ endif
+ 
+-# Build .cmxs in case of native compilation.
+-ifneq ($(TARGET),byte)
+-MENHIRLIBCMXS := menhirLib.cmxs
+-endif
+-
+ # ----------------------------------------------------------------------------
+ # Ocamlbuild tool and settings.
+ 
+@@ -117,7 +112,7 @@ stage3:
+ 
+ MENHIRSDK       := menhirSdk.cmo
+ ifneq ($(TARGET),byte)
+-MENHIRSDK       := $(MENHIRSDK) menhirSdk.cmx menhirSdk.cmxs
++MENHIRSDK       := $(MENHIRSDK) menhirSdk.cmx 
+ endif
+ 
+ # ----------------------------------------------------------------------------
