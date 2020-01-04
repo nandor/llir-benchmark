@@ -24,6 +24,9 @@ PACKAGES=[
 SWITCHES=[
   ("4.07.1+static", []),
   ("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
+  ("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
+  ("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
+  ("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
 ]
 
 # opam file to generate for the compiler versions.
@@ -337,7 +340,7 @@ BENCHMARKS=[
     ["bytes_cat", "1000000000"],
   ]),
   Benchmark(group='stdlib', name='set_bench', args=[
-    ["set_fold", "1000000"],
+    #["set_fold", "1000000"],
     ["set_add_rem", "20000000"],
     ["set_mem", "50000000"],
   ]),
@@ -375,7 +378,7 @@ BENCHMARKS=[
   Benchmark(group='stdlib', name='str_bench', args=[
     ["str_regexp", "1000000"],
     ["str_string_match", "50000000"],
-    ["str_search_forward", "5000000"],
+    #["str_search_forward", "5000000"],
     ["str_string_partial_match", "25000000"],
     ["str_global_replace", "1000000"],
     ["str_split", "2000000"],
