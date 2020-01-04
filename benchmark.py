@@ -414,9 +414,10 @@ def _run_test(test):
   pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + args)
   child_pid, status, rusage = os.wait4(pid, 0)
   if status != 0:
-    raise Error('Failed to run {} {}: {}'.format(
+    raise Exception('Failed to run {} {} in {}: {}'.format(
         bench.exe,
         ' '.join(args),
+        switch,
         status
     ))
   return bench, switch, args, (rusage.ru_utime, rusage.ru_maxrss)
@@ -445,4 +446,4 @@ def benchmark_perf(n):
 if __name__ == '__main__':
   install()
   benchmark_size()
-  benchmark_perf(25)
+  benchmark_perf(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
