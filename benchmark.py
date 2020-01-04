@@ -6,6 +6,7 @@ import sys
 import json
 import itertools
 import multiprocessing
+import random
 
 from collections import defaultdict
 from tqdm import tqdm
@@ -426,6 +427,7 @@ def benchmark_perf(n):
   for _, bench, (switch, _) in itertools.product(range(n), BENCHMARKS, SWITCHES):
     for args in bench.args:
       all_tests.append((bench, switch, args))
+  random.shuffle(all_tests)
 
   pool = multiprocessing.Pool(int(multiprocessing.cpu_count() * 0.75))
   perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
