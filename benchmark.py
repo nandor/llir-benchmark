@@ -189,15 +189,6 @@ class Benchmark(object):
     self.exe = 'benchmarks/{0}/{1}.exe'.format(group, name)
     self.args = args
 
-  def run(self, switch, args):
-    """Runs a benchmark."""
-
-    exe = os.path.join(BUILD, switch, self.exe)
-    pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + args)
-    child_pid, status, rusage = os.wait4(pid, 0)
-    assert status == 0
-    return (rusage.ru_utime, rusage.ru_maxrss)
-
 
 BENCHMARKS=[
   Benchmark(group='bdd', name='bdd', args=[
@@ -418,7 +409,17 @@ BENCHMARKS=[
 def _run_test(test):
   """Helper to run a single test."""
   bench, switch, args = test
-  return bench, switch, args, bench.run(switch, args)
+
+  exe = os.path.join(BUILD, switch, bench.exe)
+  pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + args)
+  child_pid, status, rusage = os.wait4(pid, 0)
+  if status != 0:
+    raise Error('Failed to run {} {}: {}'.format(
+        bench.exe,
+        ' '.join(args),
+        status
+    ))
+  return bench, switch, args, (rusage.ru_utime, rusage.ru_maxrss)
 
 def benchmark_perf(n):
   """Runs performance benchmarks."""
