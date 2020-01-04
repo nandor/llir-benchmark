@@ -5,6 +5,7 @@ import subprocess
 import sys
 import json
 import itertools
+import multiprocessing
 
 from collections import defaultdict
 from tqdm import tqdm
@@ -413,6 +414,11 @@ BENCHMARKS=[
   ])
 ]
 
+def _run_test(test):
+  """Helper to run a single test."""
+  bench, switch, args = test
+  return bench, switch, args, bench.run(switch, args)
+
 def benchmark_perf(n):
   """Runs performance benchmarks."""
 
@@ -421,13 +427,12 @@ def benchmark_perf(n):
     for args in bench.args:
       all_tests.append((bench, switch, args))
 
+  pool = multiprocessing.Pool(int(multiprocessing.cpu_count() * 0.75))
   perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-  for bench, switch, args in tqdm(all_tests):
-    bench_result = perf[bench.name]
-    for args in bench.args:
-      args_result = bench_result['_'.join(args)]
-      t, mem = bench.run(switch, args)
-      args_result[switch].append((t, mem))
+  for bench, switch, args, r in tqdm(pool.imap_unordered(_run_test, all_tests), total=len(all_tests)):
+    perf[bench.name]['_'.join(args)][switch].append(r)
+  pool.close()
+  pool.join()
 
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)
