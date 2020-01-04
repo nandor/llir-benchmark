@@ -1,0 +1,32 @@
+(executable (name array_bench) (modules array_bench))
+(executable (name bytes_bench) (modules bytes_bench))
+(executable (name hashtbl_bench) (modules hashtbl_bench))
+(executable (name map_bench) (modules map_bench))
+(executable (name pervasives_bench) (modules pervasives_bench))
+(executable (name set_bench) (modules set_bench))
+(executable (name stack_bench) (modules stack_bench))
+(executable (name string_bench) (modules string_bench))
+
+(executable
+  (name big_array_bench)
+  (modules big_array_bench)
+  (libraries bigarray))
+
+(executable
+  (name str_bench)
+  (modules str_bench)
+  (libraries str))
+
+(alias
+  (name buildbench)
+  (deps
+    array_bench.exe
+    big_array_bench.exe
+    bytes_bench.exe
+    hashtbl_bench.exe
+    map_bench.exe
+    pervasives_bench.exe
+    set_bench.exe
+    stack_bench.exe
+    str_bench.exe
+    string_bench.exe))

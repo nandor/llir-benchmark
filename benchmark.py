@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import collections
+from collections import defaultdict
 import os
 import subprocess
 import sys
@@ -10,8 +10,8 @@ import json
 
 # List of all packages to install.
 PACKAGES=[
-  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc", 
-  "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson", 
+  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
+  "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
   "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes",
 ]
 
@@ -19,9 +19,6 @@ PACKAGES=[
 SWITCHES=[
   ("4.07.1+static", []),
   ("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
-  ("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
-  ("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
-  ("4.07.1+genm+O3", ['--target', 'genm', '-O3'])
 ]
 
 # opam file to generate for the compiler versions.
@@ -82,9 +79,9 @@ def opam(*args):
       print('"opam {}" failed:\n'.format(' '.join(args)))
       print(stderr.decode('utf-8'))
       sys.exit(1)
-  
+
   return stdout.decode('utf-8')
-    
+
 
 def install():
   """Installs the switches and the required packages."""
@@ -94,7 +91,7 @@ def install():
     f.write('(lang dune 2.0)\n')
     for switch, _ in SWITCHES:
       f.write('(context (opam (switch {0}) (name {0})))\n'.format(switch))
-  
+
   # Set up the opam files for the switches.
   pkg_dir = os.path.join(ROOT, 'dependencies', 'packages', 'ocaml-base-compiler')
   for switch, args in SWITCHES:
@@ -102,15 +99,15 @@ def install():
     if not os.path.exists(ver_dir):
       os.makedirs(ver_dir)
     with open(os.path.join(ver_dir, 'opam'), 'w') as f:
-      f.write(OPAM.format(os.getenv('PREFIX'), ' '.join('"{}"'.format(a) for a in args))) 
+      f.write(OPAM.format(os.getenv('PREFIX'), ' '.join('"{}"'.format(a) for a in args)))
 
   # Set up opam and the custom repository.
   opam(
-      'init', 
-      '--bare', 
-      '--no-setup', 
-      '--no-opamrc', 
-      '--disable-sandboxing', 
+      'init',
+      '--bare',
+      '--no-setup',
+      '--no-opamrc',
+      '--disable-sandboxing',
       os.path.join(ROOT, 'dependencies')
   )
   opam('update')
@@ -119,10 +116,10 @@ def install():
   for switch, _ in SWITCHES:
     if switch not in opam('switch', 'list'):
       opam(
-          'switch', 
-          'create', 
-          '--yes', 
-          switch, 
+          'switch',
+          'create',
+          '--yes',
+          switch,
           'ocaml-base-compiler.{}'.format(switch)
       )
 
@@ -132,12 +129,12 @@ def install():
 
   # Build all benchmarks.
   opam(
-      'exec', 
-      '--', 
-      'dune', 
-      'build', 
-      '--profile=release', 
-      '--workspace=dune-workspace', 
+      'exec',
+      '--',
+      'dune',
+      'build',
+      '--profile=release',
+      '--workspace=dune-workspace',
       '@buildbench'
   )
 
@@ -159,7 +156,7 @@ def benchmark_size():
             continue
         files.add(name)
 
-  sizes = collections.defaultdict(dict)
+  sizes = defaultdict(dict)
   for name in files:
     for switch, _ in SWITCHES:
       bin_path = os.path.join(OPAMROOT, switch, 'bin', name)
@@ -179,73 +176,256 @@ def benchmark_size():
 class Benchmark(object):
   """Class to describe and run a benchmark."""
 
-  def __init__(self, name, exe=None, args=[]):
+  def __init__(self, group, name, args=[[]]):
     """Configures a benchmark."""
+
+    self.group = group
     self.name = name
-    self.exe = exe if exe else 'benchmarks/{0}/{0}.exe'.format(name)
+    self.exe = 'benchmarks/{0}/{1}.exe'.format(group, name)
     self.args = args
 
-  def run(self, switch):
+  def run(self, switch, args):
     """Runs a benchmark."""
-    
+
     exe = os.path.join(BUILD, switch, self.exe)
-    pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + self.args)
+    pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + args)
     child_pid, status, rusage = os.wait4(pid, 0)
     assert status == 0
-    print(self.name, switch, rusage.ru_utime, rusage.ru_maxrss)
+    return (rusage.ru_utime, rusage.ru_maxrss)
 
 
 BENCHMARKS=[
-  Benchmark(
-    name='bdd', 
-    args=['26']
-  ),
-  Benchmark(
-    name='durand_kerner_aberth',
-    exe='benchmarks/numerical-analysis/durand_kerner_aberth.exe',
-    args=['100']
-  ),
-  Benchmark(
-    name='fft',
-    exe='benchmarks/numerical-analysis/fft.exe',
-    args=['1_048_576']
-  ),
-  Benchmark(
-    name='levinson_durbin',
-    exe='benchmarks/numerical-analysis/levinson_durbin.exe',
-    args=['10_000']
-  ),
-  Benchmark(
-    name='lu_decomposition',
-    exe='benchmarks/numerical-analysis/lu_decomposition.exe',
-  ),
-  Benchmark(
-    name='naive_multilayer',
-    exe='benchmarks/numerical-analysis/naive_multilayer.exe',
-  ),
-  Benchmark(
-    name='qr_decomposition',
-    exe='benchmarks/numerical-analysis/qr_decomposition.exe',
-  ),
-  Benchmark(
-    name='alloc', 
-    exe='benchmarks/simple-tests/alloc.exe', 
-    args=['400_000']
-  ),
-  Benchmark(
-    name='morestacks',
-    exe='benchmarks/simple-tests/morestacks.exe',
-    args=['1_000']
-  ),
+  Benchmark(group='bdd', name='bdd', args=[
+    ['26']
+  ]),
+
+  Benchmark(group='numerical-analysis', name='durand_kerner_aberth', args=[
+    ['100']
+  ]),
+  Benchmark(group='numerical-analysis', name='fft', args=[
+    ['1_048_576']
+  ]),
+  Benchmark(group='numerical-analysis', name='levinson_durbin', args=[
+    ['10_000']
+  ]),
+  Benchmark(group='numerical-analysis', name='lu_decomposition', args=[
+    []
+  ]),
+  Benchmark(group='numerical-analysis', name='naive_multilayer', args=[
+    []
+  ]),
+  Benchmark(group='numerical-analysis', name='qr_decomposition', args=[
+    []
+  ]),
+
+  Benchmark(group='simple-tests', name='alloc', args=[
+    ['400_000']
+  ]),
+  Benchmark(group='simple-tests', name='morestacks', args=[
+    ['1_000']
+  ]),
+  Benchmark(group='simple-tests', name='stress', args=[
+    ["1", "10"],
+    ["10000", "10"],
+    ["100000", "10"],
+    ["1", "25"],
+    ["10000", "25"],
+    ["100000", "25"],
+    ["1", "50"],
+    ["10000", "50"],
+    ["100000", "50"],
+    ["1", "75"],
+    ["10000", "75"],
+    ["100000", "75"],
+    ["1", "100"],
+    ["10000", "100"],
+    ["100000", "100"],
+  ]),
+  Benchmark(group='simple-tests', name='capi', args=[
+    ["test_no_args_alloc", "200_000_000"],
+    ["test_no_args_noalloc", "200_000_000"],
+    ["test_few_args_alloc", "200_000_000"],
+    ["test_few_args_noalloc", "200_000_000"],
+    ["test_many_args_alloc", "200_000_000"],
+    ["test_many_args_noalloc", "200_000_000"],
+  ]),
+  Benchmark(group='simple-tests', name='stacks', args=[
+    ["100000", "ints-small"],
+    ["20000", "ints-large"],
+    ["100000", "floats-small"],
+    ["20000", "floats-large"],
+  ]),
+  Benchmark(group='simple-tests', name='weakretain', args=[
+    ["25", "1000"],
+    ["25", "100000"],
+    ["25", "10000000"],
+    ["50", "1000"],
+    ["50", "100000"],
+    ["50", "10000000"],
+    ["75", "1000"],
+    ["75", "100000"],
+    ["75", "10000000"],
+    ["100", "1000"],
+    ["100", "100000"],
+    ["100", "10000000"],
+  ]),
+  Benchmark(group='simple-tests', name='lazylist', args=[
+    ["100000", "100"],
+    ["10000", "1000"],
+    ["1000", "10000"],
+  ]),
+  Benchmark(group='simple-tests', name='lists', args=[
+    ["int", "1"],
+    ["int", "10000"],
+    ["int", "100000"],
+    ["float", "1"],
+    ["float", "10000"],
+    ["float", "100000"],
+    ["int-tuple", "1"],
+    ["int-tuple", "10000"],
+    ["int-tuple", "100000"],
+    ["float-tuple", "1"],
+    ["float-tuple", "10000"],
+    ["float-tuple", "100000"],
+    ["string", "1"],
+    ["string", "10000"],
+    ["string", "100000"],
+    ["record", "1"],
+    ["record", "10000"],
+    ["record", "100000"],
+    ["float-array", "1"],
+    ["float-array", "10000"],
+    ["float-array", "100000"],
+    ["int-array", "1"],
+    ["int-array", "10000"],
+    ["int-array", "100000"],
+    ["int-option-array", "1"],
+    ["int-option-array", "10000"],
+    ["int-option-array", "100000"],
+  ]),
+  Benchmark(group='simple-tests', name='finalise', args=[
+    ["10"],
+    ["20"],
+    ["30"],
+    ["40"],
+    ["50"],
+    ["60"],
+    ["70"],
+    ["80"],
+    ["90"],
+    ["100"],
+  ]),
+
+  Benchmark(group='stdlib', name='stack_bench', args=[
+    ["stack_fold", "2500000"],
+    ["stack_push_pop", "100000000"],
+  ]),
+  Benchmark(group='stdlib', name='array_bench', args=[
+    ["array_forall", "1000", "100000"],
+    ["array_fold", "1000", "100000"],
+    ["array_iter", "1000", "100000"],
+  ]),
+  Benchmark(group='stdlib', name='bytes_bench', args=[
+    ["bytes_get", "100000000"],
+    ["bytes_sub", "100000000"],
+    ["bytes_blit", "2500000"],
+    ["bytes_concat", "2000000"],
+    ["bytes_iter", "1000000"],
+    ["bytes_map", "1000000"],
+    ["bytes_trim", "2500000"],
+    ["bytes_index", "10000000"],
+    ["bytes_contains", "100000000"],
+    ["bytes_uppercase_ascii", "1000000"],
+    ["bytes_set", "1000000000"],
+    ["bytes_cat", "1000000000"],
+  ]),
+  Benchmark(group='stdlib', name='set_bench', args=[
+    ["set_fold", "1000000"],
+    ["set_add_rem", "20000000"],
+    ["set_mem", "50000000"],
+  ]),
+  Benchmark(group='stdlib', name='hashtbl_bench', args=[
+    ["int_replace1", "10000"],
+    ["int_find1", "20000"],
+    ["caml_hash_int", "200000"],
+    ["caml_hash_tuple", "100000"],
+    ["int_replace2", "100000"],
+    ["int_find2", "300000"],
+    ["hashtbl_iter", "200000"],
+    ["hashtbl_fold", "200000"],
+    ["hashtbl_add_resizing", "4000000"],
+    ["hashtbl_add_sized", "6000000"],
+    ["hashtbl_add_duplicate", "2000000"],
+    ["hashtbl_remove", "4000000"],
+    ["hashtbl_find", "6000000"],
+    ["hashtbl_filter_map", "100000"],
+  ]),
+  Benchmark(group='stdlib', name='string_bench', args=[
+    ["string_get", "50000000"],
+    ["string_sub", "50000000"],
+    ["string_blit", "25000000"],
+    ["string_concat", "20000000"],
+    ["string_iter", "1000000"],
+    ["string_map", "20000000"],
+    ["string_trim", "1000000"],
+    ["string_index", "25000000"],
+    ["string_contains", "25000000"],
+    ["string_uppercase_ascii", "1000000"],
+    ["string_split_on_char", "500000"],
+    ["string_compare", "10000"],
+    ["string_equal", "25000"],
+  ]),
+  Benchmark(group='stdlib', name='str_bench', args=[
+    ["str_regexp", "1000000"],
+    ["str_string_match", "50000000"],
+    ["str_search_forward", "5000000"],
+    ["str_string_partial_match", "25000000"],
+    ["str_global_replace", "1000000"],
+    ["str_split", "2000000"],
+  ]),
+  Benchmark(group='stdlib', name='pervasives_bench', args=[
+    ["pervasives_equal_lists", "1000000000"],
+    ["pervasives_compare_lists", "100000000"],
+    ["pervasives_equal_ints", "1000000000"],
+    ["pervasives_compare_ints", "1000000000"],
+    ["pervasives_equal_floats", "1000000000"],
+    ["pervasives_compare_floats", "200000000"],
+    ["pervasives_equal_strings", "20000000"],
+    ["pervasives_compare_strings", "20000000"],
+  ]),
+  Benchmark(group='stdlib', name='map_bench', args=[
+    ["map_iter", "10000"],
+    ["map_add", "1000000"],
+    ["map_add_duplicate", "1000000"],
+    ["map_remove", "1000000"],
+    ["map_fold", "10000"],
+    ["map_for_all", "10000"],
+    ["map_find", "1000000"],
+    ["map_map", "10000"],
+  ]),
+  Benchmark(group='stdlib', name='big_array_bench', args=[
+    ["big_array_int_rev", "1024", "50000"],
+    ["big_array_int32_rev", "1024", "50000"],
+  ])
 ]
 
 def benchmark_perf():
   """Runs performance benchmarks."""
 
-  for benchmark in BENCHMARKS:
-    for switch, _ in SWITCHES:
-      benchmark.run(switch)
+  perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+  for _ in range(25):
+    for benchmark in BENCHMARKS:
+      bench_result = perf[benchmark.name]
+      for args in benchmark.args:
+        args_result = bench_result['_'.join(args)]
+        for switch, _ in SWITCHES:
+          t, mem = benchmark.run(switch, args)
+          args_result[switch].append((t, mem))
 
+  if not os.path.exists(RESULT):
+    os.makedirs(RESULT)
+  with open(os.path.join(RESULT, 'perf'), 'w') as f:
+    f.write(json.dumps(perf, sort_keys=True, indent=2))
 
 if __name__ == '__main__':
   install()
