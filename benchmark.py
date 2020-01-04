@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
-from collections import defaultdict
 import os
 import subprocess
 import sys
 import json
+import itertools
+
+from collections import defaultdict
+from tqdm import tqdm
 
 
 
@@ -325,6 +328,7 @@ BENCHMARKS=[
     ["array_fold", "1000", "100000"],
     ["array_iter", "1000", "100000"],
   ]),
+
   Benchmark(group='stdlib', name='bytes_bench', args=[
     ["bytes_get", "100000000"],
     ["bytes_sub", "100000000"],
@@ -409,18 +413,21 @@ BENCHMARKS=[
   ])
 ]
 
-def benchmark_perf():
+def benchmark_perf(n):
   """Runs performance benchmarks."""
 
+  all_tests = []
+  for _, bench, (switch, _) in itertools.product(range(n), BENCHMARKS, SWITCHES):
+    for args in bench.args:
+      all_tests.append((bench, switch, args))
+
   perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-  for _ in range(25):
-    for benchmark in BENCHMARKS:
-      bench_result = perf[benchmark.name]
-      for args in benchmark.args:
-        args_result = bench_result['_'.join(args)]
-        for switch, _ in SWITCHES:
-          t, mem = benchmark.run(switch, args)
-          args_result[switch].append((t, mem))
+  for bench, switch, args in tqdm(all_tests):
+    bench_result = perf[bench.name]
+    for args in bench.args:
+      args_result = bench_result['_'.join(args)]
+      t, mem = bench.run(switch, args)
+      args_result[switch].append((t, mem))
 
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)
@@ -430,4 +437,4 @@ def benchmark_perf():
 if __name__ == '__main__':
   install()
   benchmark_size()
-  benchmark_perf()
+  benchmark_perf(25)
