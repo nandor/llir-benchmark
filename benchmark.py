@@ -473,10 +473,6 @@ SEQUENCE = [
   Benchmark(group='sequence', name='sequence_cps', args=[['10000']])
 ]
 
-VALET = [
-  Benchmark(group='valet', name='test_lwt', args=[['200']])
-]
-
 YOJSON = [
   Benchmark(group='yojson', name='ydump', args=[['-c', 'sample.json']])
 ]
@@ -491,7 +487,6 @@ BENCHMARKS =\
   MENHIR +\
   SIMPLE_TESTS +\
   STDLIB +\
-  VALET +\
   YOJSON
 
 
@@ -545,7 +540,13 @@ def benchmark_perf(n):
   with open(os.path.join(RESULT, 'perf'), 'w') as f:
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
+
+def benchmark_micro():
+  """Runs microbenchmarks."""
+  pass
+
 if __name__ == '__main__':
   install()
   benchmark_size()
   benchmark_perf(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  benchmark_micro()
