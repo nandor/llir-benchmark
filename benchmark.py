@@ -194,6 +194,10 @@ class Benchmark(object):
 
 
 BENCHMARKS=[
+  Benchmark(group='almabench', name='almabench', args=[
+    ['10']
+  ]),
+
   Benchmark(group='bdd', name='bdd', args=[
     ['26']
   ]),
