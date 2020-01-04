@@ -30,13 +30,13 @@ let rev a =
 
 let big_array_int_rev iterations length =
   let a = create_int_array length in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     Sys.opaque_identity (ignore (rev a))
   done
 
 let big_array_int32_rev iterations length =
   let a = create_int32_array length in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     Sys.opaque_identity (ignore (rev a))
   done
 

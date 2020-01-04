@@ -3,7 +3,7 @@ let list_a = [1; 2; 3]
 let list_b = [3; 1; 2]
 
 let pervasives_compare_lists iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (compare list_a list_b))
   done
 
@@ -24,7 +24,7 @@ let pervasives_compare_strings iterations =
   done
 
 let pervasives_equal_lists iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (list_a == list_b))
   done
 

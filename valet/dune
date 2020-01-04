@@ -1,0 +1,7 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+(executable
+ (name test_lwt)
+ (libraries uuidm ocplib-endian unix react lwt lwt.unix))
+
+(alias (name buildbench) (deps test_lwt.exe))

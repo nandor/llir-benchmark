@@ -1,0 +1,6 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+(executable
+  (name sequence_cps))
+
+(alias (name buildbench) (deps sequence_cps.exe))

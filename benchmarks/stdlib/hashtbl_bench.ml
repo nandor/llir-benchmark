@@ -45,13 +45,13 @@ let create_hashtbl size =
 
 let hashtbl_iter iterations =
   let h = create_hashtbl n in
-  for i = 1 to iterations do
-    Hashtbl.iter (fun key data_ -> Sys.opaque_identity ()) h
+  for _ = 1 to iterations do
+    Hashtbl.iter (fun _key _data -> Sys.opaque_identity ()) h
   done
 
 let hashtbl_fold iterations =
   let h = create_hashtbl n in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Hashtbl.fold (fun c k v -> c + k + v) h 0))
   done
 
@@ -83,7 +83,7 @@ let hashtbl_find iterations =
 
 let hashtbl_filter_map iterations =
   let h = create_hashtbl n in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     Hashtbl.filter_map_inplace (fun _a b -> Some (2 * b)) h
   done
 
@@ -131,7 +131,7 @@ let () =
   | "caml_hash_tuple" ->
       for _ = 0 to iterations do
         Sys.opaque_identity (caml_hashtbl_hash_tuple ())
-      done      
+      done
   | "hashtbl_iter" ->
       hashtbl_iter iterations
   | "hashtbl_fold" ->

@@ -43,8 +43,8 @@ let gemv_t a x =
 
 (** [gemm x y] computes [x * y] where [x] and [y] are (rectangular) matrices. *)
 let gemm x y =
-  let m, k = matrix_size x in
-  let k', n = matrix_size y in
+  let _, k = matrix_size x in
+  let k', _ = matrix_size y in
   assert(k = k');
   Array.map (gemv_t y) x
 

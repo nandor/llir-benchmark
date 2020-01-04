@@ -23,7 +23,7 @@ let bytes_set iterations =
 
 let bytes_cat iterations =
   let s = Bytes.of_string "I AM A FISH" in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.cat s test_bytes))
   done
 
@@ -44,38 +44,38 @@ let bytes_blit iterations =
 let bytes_concat iterations =
   let fish = List.map Bytes.of_string ["I"; "AM"; "A"; "FISH"] in
   let delim = Bytes.of_string " " in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.concat delim fish))
   done
 
 let bytes_iter iterations =
-  for i = 1 to iterations do
-    Bytes.iter (fun c -> ()) test_bytes
+  for _ = 1 to iterations do
+    Bytes.iter (fun _ -> ()) test_bytes
   done
 
 let bytes_map iterations =
-  for i = 1 to iterations do
-    ignore (Sys.opaque_identity (Bytes.map (fun c -> '!') test_bytes))
+  for _ = 1 to iterations do
+    ignore (Sys.opaque_identity (Bytes.map (fun _ -> '!') test_bytes))
   done
 
 let bytes_trim iterations =
   let bytes_needing_trimming = Bytes.of_string "We need a trim\n\n\n\n\n" in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.trim bytes_needing_trimming))
   done
 
 let bytes_index iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.index test_bytes 'r'))
   done
 
 let bytes_contains iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.contains test_bytes 'r'))
   done
 
 let bytes_uppercase_ascii iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Bytes.uppercase_ascii test_bytes))
   done
 

@@ -52,7 +52,7 @@ let lup a0 =
   for j = 0 to r - 1 do
     (* pivot selection (swapping rows) *)
     let j' = get_pivot j in
-    if j <> j' then Array.(swap p j j' ; swap a j j' ; swap lu j j');
+    if j <> j' then (swap p j j' ; swap a j j' ; swap lu j j');
     (* Compute LU decomposition *)
     for i = 0 to j do lu.(i).(j) <- aux i j (i-1) done;
     if abs_float lu.(j).(j) > 1e-6 (* Avoid divsion by zero *)

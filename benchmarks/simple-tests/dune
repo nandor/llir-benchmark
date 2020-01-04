@@ -16,13 +16,13 @@
 (library
   (name ocamlcapi)
   (modules ocamlcapi)
-  (foreign_stubs 
-    (language c) 
+  (foreign_stubs
+    (language c)
     (names ocamlcapi)))
 
-(alias 
-  (name buildbench) 
-  (deps 
+(alias
+  (name buildbench)
+  (deps
     alloc.exe
     lists.exe
     capi.exe

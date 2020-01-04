@@ -1,6 +1,5 @@
 (** fft.ml --- Cooley-Tukey fast Fourier transform algorithm *)
 
-open Format
 open Complex
 
 (** [get_n_bits n] returns the number of bits of [n]. *)

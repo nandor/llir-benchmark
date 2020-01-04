@@ -15,7 +15,7 @@ let create_set size =
 
 let set_fold iterations =
   let s = create_set length in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (IntSet.fold (fun c s -> c + s) s 0))
   done
 

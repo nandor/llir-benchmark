@@ -1,12 +1,12 @@
 let size = 10_000
 
-let alist = 
+let alist =
   let rec list_init n s =
     if n < 0 then
       s
     else
       list_init (n-1) ((n,n) :: s)
-    in 
+    in
       list_init (size-1) []
 
 module IntMap = Map.Make (struct
@@ -18,8 +18,8 @@ end)
 let map = List.fold_left (fun m (i, j) -> IntMap.add i j m) IntMap.empty alist
 
 let map_iter iterations =
-  for i = 1 to iterations do
-    IntMap.iter (fun key data_ -> Sys.opaque_identity ()) map
+  for _ = 1 to iterations do
+    IntMap.iter (fun _key _data -> Sys.opaque_identity ()) map
   done
 
 let map_add iterations =
@@ -44,12 +44,12 @@ let map_remove iterations =
   r map iterations
 
 let map_fold iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (IntMap.fold (fun c k v -> c + k + v) map 0))
   done
 
 let map_for_all iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore
       (Sys.opaque_identity
          (IntMap.for_all (fun x y -> x < size && y < size) map))
@@ -61,7 +61,7 @@ let map_find iterations =
   done
 
 let map_map iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (IntMap.map (fun a -> 2 * a) map))
   done
 

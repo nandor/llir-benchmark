@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 
+import contextlib
+import itertools
+import json
+import multiprocessing
 import os
+import random
 import subprocess
 import sys
-import json
-import itertools
-import multiprocessing
-import random
 
 from collections import defaultdict
 from tqdm import tqdm
@@ -66,7 +67,6 @@ url {{
 
 ROOT=os.path.dirname(os.path.realpath(__file__))
 OPAMROOT=os.path.join(ROOT, '_opam')
-BUILD=os.path.join(ROOT, '_build')
 RESULT=os.path.join(ROOT, '_result')
 
 def opam(*args):
@@ -184,24 +184,65 @@ def benchmark_size():
 class Benchmark(object):
   """Class to describe and run a benchmark."""
 
-  def __init__(self, group, name, args=[[]]):
+  def __init__(self, group, name, exe=None, args=[[]]):
     """Configures a benchmark."""
 
     self.group = group
     self.name = name
-    self.exe = 'benchmarks/{0}/{1}.exe'.format(group, name)
+    if exe:
+      self.exe = '_opam/{{0}}/bin/{0}'.format(exe)
+    else:
+      self.exe = '_build/{{0}}/benchmarks/{0}/{1}.exe'.format(group, name)
     self.args = args
 
 
-BENCHMARKS=[
-  Benchmark(group='almabench', name='almabench', args=[
-    ['10']
-  ]),
+class Chdir(object):
+  """Helper to temporarily change the working dir."""
 
-  Benchmark(group='bdd', name='bdd', args=[
-    ['26']
-  ]),
+  def __init__(self, new_path):
+    self.saved_path = os.getcwd()
+    self.new_path = new_path
 
+  def __enter__(self):
+    os.chdir(self.new_path)
+
+  def __exit__(self, type, value, traceback):
+    os.chdir(self.saved_path)
+
+
+ALMABENCH = [
+  Benchmark(group='almabench', name='almabench', args=[['10']]),
+]
+
+BDD = [
+  Benchmark(group='bdd', name='bdd', args=[['26']]),
+]
+
+BENCHMARKSGAME = [
+  Benchmark(group='benchmarksgame', name='binarytrees5', args=[['20']]),
+  Benchmark(group='benchmarksgame', name='fannkuchredux2', args=[['11']]),
+  Benchmark(group='benchmarksgame', name='fannkuchredux', args=[['11']]),
+  Benchmark(group='benchmarksgame', name='fasta3'),
+  Benchmark(group='benchmarksgame', name='fasta6'),
+  Benchmark(group='benchmarksgame', name='knucleotide'),
+  Benchmark(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
+  Benchmark(group='benchmarksgame', name='nbody', args=[['100000000']]),
+  ##Benchmark(group='benchmarksgame', name='pidigits5'),
+  Benchmark(group='benchmarksgame', name='regexredux2'),
+  Benchmark(group='benchmarksgame', name='revcomp2'),
+  Benchmark(group='benchmarksgame', name='spectralnorm2'),
+]
+
+CHAMENEOS = [
+  Benchmark(group='chameneos', name='chameneos_redux_lwt', args=[['600000']]),
+]
+
+KB = [
+  Benchmark(group='kb', name='kb', args=[[]]),
+  Benchmark(group='kb', name='kb_no_exc', args=[[]]),
+]
+
+NUMERICAL_ANALYSIS = [
   Benchmark(group='numerical-analysis', name='durand_kerner_aberth', args=[
     ['100']
   ]),
@@ -220,7 +261,20 @@ BENCHMARKS=[
   Benchmark(group='numerical-analysis', name='qr_decomposition', args=[
     []
   ]),
+]
 
+MENHIR = [
+  Benchmark(
+      group='menhir',
+      name='menhir',
+      exe='menhir',
+      args=[
+        ['-v', '--table', 'sysver.mly']
+      ]
+  )
+]
+
+SIMPLE_TESTS = [
   Benchmark(group='simple-tests', name='alloc', args=[
     ['400_000']
   ]),
@@ -318,7 +372,9 @@ BENCHMARKS=[
     ["90"],
     ["100"],
   ]),
+]
 
+STDLIB = [
   Benchmark(group='stdlib', name='stack_bench', args=[
     ["stack_fold", "2500000"],
     ["stack_push_pop", "100000000"],
@@ -413,21 +469,53 @@ BENCHMARKS=[
   ])
 ]
 
+SEQUENCE = [
+  Benchmark(group='sequence', name='sequence_cps', args=[['10000']])
+]
+
+VALET = [
+  Benchmark(group='valet', name='test_lwt', args=[['200']])
+]
+
+YOJSON = [
+  Benchmark(group='yojson', name='ydump', args=[['-c', 'sample.json']])
+]
+
+BENCHMARKS =\
+  ALMABENCH +\
+  BDD +\
+  BENCHMARKSGAME +\
+  CHAMENEOS +\
+  KB +\
+  NUMERICAL_ANALYSIS +\
+  MENHIR +\
+  SIMPLE_TESTS +\
+  STDLIB +\
+  VALET +\
+  YOJSON
+
+
 def _run_test(test):
   """Helper to run a single test."""
-  bench, switch, args = test
+  result = None
+  try:
+    bench, switch, args = test
+    exe = os.path.join(ROOT, bench.exe.format(switch))
+    with Chdir(os.path.join(ROOT, '_build', switch, 'benchmarks', bench.group)):
+      task = subprocess.Popen(
+          [exe] + args,
+          stdout=subprocess.DEVNULL,
+          stderr=subprocess.DEVNULL
+      )
+      child_pid, status, rusage = os.wait4(task.pid, 0)
 
-  exe = os.path.join(BUILD, switch, bench.exe)
-  pid = os.spawnvp(os.P_NOWAIT, exe, [exe] + args)
-  child_pid, status, rusage = os.wait4(pid, 0)
-  if status != 0:
-    raise Exception('Failed to run {} {} in {}: {}'.format(
-        bench.exe,
-        ' '.join(args),
-        switch,
-        status
-    ))
-  return bench, switch, args, (rusage.ru_utime, rusage.ru_maxrss)
+    if status == 0:
+      result = (rusage.ru_utime, rusage.ru_maxrss)
+  except:
+    pass
+
+  return bench, switch, args, result
+
 
 def benchmark_perf(n):
   """Runs performance benchmarks."""
@@ -440,10 +528,17 @@ def benchmark_perf(n):
 
   pool = multiprocessing.Pool(int(multiprocessing.cpu_count() * 0.75))
   perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+  failed = []
   for bench, switch, args, r in tqdm(pool.imap_unordered(_run_test, all_tests), total=len(all_tests)):
+    if not r:
+      failed.append((bench.exe.format(switch), ' '.join(args)))
+      continue
     perf[bench.name]['_'.join(args)][switch].append(r)
   pool.close()
   pool.join()
+
+  for name, args in failed:
+    print('Failed to run {} {}'.format(name, args))
 
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)

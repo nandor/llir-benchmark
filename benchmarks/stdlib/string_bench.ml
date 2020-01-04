@@ -29,44 +29,44 @@ let string_blit iterations =
   done
 
 let string_concat iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     let fish = ["I"; "AM"; "A"; "FISH"] in
     ignore (Sys.opaque_identity (String.concat " " fish))
   done
 
 let string_iter iterations =
-  for i = 1 to iterations do
-    String.iter (fun c -> ()) test_string
+  for _ = 1 to iterations do
+    String.iter (fun _ -> ()) test_string
   done
 
 let string_map iterations =
-  for i = 1 to iterations do
-    ignore (Sys.opaque_identity (String.map (fun c -> '!') test_string))
+  for _ = 1 to iterations do
+    ignore (Sys.opaque_identity (String.map (fun _ -> '!') test_string))
   done
 
 let string_trim iterations =
   let string_needing_trimming = "We need a trim\n\n\n\n\n" in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (String.trim string_needing_trimming))
   done
 
 let string_index iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (String.index test_string 'r'))
   done
 
 let string_contains iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (String.contains test_string 'r'))
   done
 
 let string_uppercase_ascii iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (String.uppercase_ascii test_string))
   done
 
 let string_split_on_char iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (String.split_on_char ' ' test_string))
   done
 
@@ -74,7 +74,7 @@ let string_compare iterations =
   let all_words = String.split_on_char ' ' test_string in
   let sum_all_compare x = List.fold_left (fun acc y -> acc + String.compare x y) 0 all_words in
   let accum_fn acc x = acc + sum_all_compare x in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (List.fold_left accum_fn 0 all_words))
   done
 
@@ -82,7 +82,7 @@ let string_equal iterations =
   let all_words = String.split_on_char ' ' test_string in
   let sum_all_equal x = List.fold_left (fun acc y -> if String.equal x y then acc+1 else acc) 0 all_words in
   let accum_fn acc x = acc + sum_all_equal x in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (List.fold_left accum_fn 0 all_words))
   done
 

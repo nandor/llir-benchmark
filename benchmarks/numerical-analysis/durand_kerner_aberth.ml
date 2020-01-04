@@ -3,7 +3,6 @@
     [MIT Lisence] Copyright (C) 2015 Akinori ABE
 *)
 
-open Format
 open Complex
 
 let fold_lefti f init x =

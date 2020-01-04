@@ -11,37 +11,37 @@ let test_string =
    primum doceri utique postgraduate in computing, incipiens in MCMLIII."
 
 let str_regexp iterations =
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.regexp test_regex))
   done
 
 let str_string_match iterations =
   let regex = Str.regexp test_regex in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.string_match regex test_string 0))
   done
 
 let str_search_forward iterations =
   let regex = Str.regexp test_regex in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.search_forward regex test_string 0))
   done
 
 let str_string_partial_match iterations =
   let regex = Str.regexp test_regex in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.string_partial_match regex test_string 0))
   done
 
 let str_global_replace iterations =
   let regex = Str.regexp test_regex in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.global_replace regex "." test_string))
   done
 
 let str_split iterations =
   let regex = Str.regexp "@" in
-  for i = 1 to iterations do
+  for _ = 1 to iterations do
     ignore (Sys.opaque_identity (Str.split regex test_string))
   done
 

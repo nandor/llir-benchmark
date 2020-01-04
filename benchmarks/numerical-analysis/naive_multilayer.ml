@@ -201,9 +201,6 @@ let actv_softmax' z =
   init_matrix n n
     (fun i j -> if i = j then (1.0 -. z.(i)) *. z.(i) else ~-. (z.(i) *. z.(j)))
 
-(** A linear function (used at the output layer for regression) *)
-let actv_linear x = x
-
 (** The derivative of a linear function *)
 let actv_linear z =
   let n = Array.length z in
@@ -235,7 +232,7 @@ let main samples =
     make_layer actv_tanh actv_tanh' input_dim hidden1_dim;
     make_layer actv_tanh actv_tanh' hidden1_dim hidden2_dim;
     make_layer actv_softmax actv_softmax' hidden2_dim output_dim; ] in
-  for i = 1 to 1000 do
+  for _ = 1 to 1000 do
     Array.iter (fun (x, t) ->
         (* check_gradient nnet x t; *)
         train ~eta:0.01 nnet x t) samples;

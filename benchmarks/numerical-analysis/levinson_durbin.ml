@@ -3,8 +3,6 @@
     [MIT Lisence] Copyright (C) 2015 Akinori ABE
 *)
 
-open Format
-
 (** [mapi_sum f [|x1; x2; ...; xn|]] is [f x1 +. f x2 +. ... +. f xn]. *)
 let mapi_sum f x =
   let acc = ref 0.0 in
@@ -44,7 +42,7 @@ let levinson r =
   in
   aux 0 [||] r.(0)
 
-let print_ar_coeffs label data order =
+let print_ar_coeffs _label data order =
   let r = autocorr data (order + 1) in
   let (ar, sigma2) = levinson r in
   (ar, sigma2)
