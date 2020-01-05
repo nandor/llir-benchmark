@@ -8,6 +8,7 @@ import os
 import random
 import subprocess
 import sys
+import statistics
 
 from collections import defaultdict
 from tqdm import tqdm
@@ -490,7 +491,7 @@ MACRO_BENCHMARKS =\
   YOJSON
 
 
-def _run_test(test):
+def _run_macro_test(test):
   """Helper to run a single test."""
   result = None
   try:
@@ -522,13 +523,13 @@ def benchmark_macro(n):
   random.shuffle(all_tests)
 
   pool = multiprocessing.Pool(int(multiprocessing.cpu_count() * 0.75))
-  perf = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+  perf = defaultdict(lambda: defaultdict(list))
   failed = []
-  for bench, switch, args, r in tqdm(pool.imap_unordered(_run_test, all_tests), total=len(all_tests)):
+  for bench, switch, args, r in tqdm(pool.imap_unordered(_run_macro_test, all_tests), total=len(all_tests)):
     if not r:
       failed.append((bench.exe.format(switch), ' '.join(args)))
       continue
-    perf[bench.name]['_'.join(args)][switch].append(r)
+    perf["{}.{}".format(bench.name, '_'.join(args))][switch].append(r)
   pool.close()
   pool.join()
 
@@ -541,15 +542,78 @@ def benchmark_macro(n):
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
 
-MICRO_BENCHMARKS=[]
+class Micro(object):
+  def __init__(self, name):
+    self.name = name
+    self.exe = '_build/{{0}}/micro/{0}/{0}.exe'.format(name)
 
 
-def benchmark_micro(n):
+MICRO_BENCHMARKS=[
+  Micro('almabench'),
+  Micro('bdd'),
+  Micro('bigarray_rev'),
+  Micro('boyer'),
+  Micro('fft'),
+  Micro('fibonacci'),
+  Micro('format'),
+  Micro('hamming'),
+  Micro('harness'),
+  Micro('kahan_sum'),
+  Micro('kb'),
+  Micro('lens'),
+  Micro('list'),
+  Micro('nucleic'),
+  Micro('num_analyis'),
+  Micro('sequence'),
+  Micro('sieve'),
+  Micro('vector_functor'),
+]
+
+def _run_micro_test(exe):
+  """Runs a micro benchmark and captures its output."""
+
+  p = subprocess.Popen(
+      [exe, "--longer", "--stabilize-gc"],
+      stdout=subprocess.PIPE,
+      stderr=subprocess.DEVNULL
+  )
+  out, _ = p.communicate()
+  if p.returncode != 0:
+    print("Failed to run {}".format(exe))
+    return ""
+  return out.decode("utf-8")
+
+
+def benchmark_micro():
   """Runs microbenchmarks."""
-  pass
+
+  samples = defaultdict(list)
+  all_tests = list(itertools.product(MICRO_BENCHMARKS, SWITCHES))
+  for bench, (switch, _) in tqdm(all_tests):
+    result = _run_micro_test(bench.exe.format(switch))
+    lines = result.split('\n')
+    test = None
+    for prev, line in zip(lines, lines[1:]):
+      if 'parameter' in line:
+        test = prev.replace(' ', '_')
+        continue
+      if not line or not prev:
+        continue
+      runs, _, nanos, _, _, _, _, _, _ = line.strip().split(' ')
+      samples[("{}.{}".format(bench.name, test), switch)].append(float(nanos) / float(runs))
+
+  perf = defaultdict(dict)
+  for (name, switch), ratios in samples.items():
+    perf[name][switch] = statistics.median(ratios)
+
+  if not os.path.exists(RESULT):
+    os.makedirs(RESULT)
+  with open(os.path.join(RESULT, 'micro'), 'w') as f:
+    f.write(json.dumps(perf, sort_keys=True, indent=2))
+
 
 if __name__ == '__main__':
   install()
-  #benchmark_size()
-  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  benchmark_micro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  benchmark_size()
+  benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  benchmark_micro()
