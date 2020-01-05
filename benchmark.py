@@ -24,11 +24,11 @@ PACKAGES=[
 
 # List of all switches to evaluate.
 SWITCHES=[
-  ("4.07.1+static", []),
-  #("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
-  #("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
-  #("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
-  #("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
+  ("4.07.1+static", ['-cc', 'musl-gcc']),
+  ("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
+  ("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
+  ("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
+  ("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
 ]
 
 # opam file to generate for the compiler versions.
