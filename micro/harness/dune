@@ -1,0 +1,12 @@
+
+(library
+  (name harness)
+  (modules
+    micro_bench_run
+    micro_bench_types
+    time_stamp_counter)
+  (modules_without_implementation
+    micro_bench_types)
+  (foreign_stubs
+    (language c)
+    (names cycles)))

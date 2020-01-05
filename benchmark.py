@@ -24,10 +24,10 @@ PACKAGES=[
 # List of all switches to evaluate.
 SWITCHES=[
   ("4.07.1+static", []),
-  ("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
-  ("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
-  ("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
-  ("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
+  #("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
+  #("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
+  #("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
+  #("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
 ]
 
 # opam file to generate for the compiler versions.
@@ -181,21 +181,6 @@ def benchmark_size():
     f.write(json.dumps(sizes, sort_keys=True, indent=2))
 
 
-class Benchmark(object):
-  """Class to describe and run a benchmark."""
-
-  def __init__(self, group, name, exe=None, args=[[]]):
-    """Configures a benchmark."""
-
-    self.group = group
-    self.name = name
-    if exe:
-      self.exe = '_opam/{{0}}/bin/{0}'.format(exe)
-    else:
-      self.exe = '_build/{{0}}/benchmarks/{0}/{1}.exe'.format(group, name)
-    self.args = args
-
-
 class Chdir(object):
   """Helper to temporarily change the working dir."""
 
@@ -210,61 +195,76 @@ class Chdir(object):
     os.chdir(self.saved_path)
 
 
+class Macro(object):
+  """Class to describe and run a benchmark."""
+
+  def __init__(self, group, name, exe=None, args=[[]]):
+    """Configures a benchmark."""
+
+    self.group = group
+    self.name = name
+    if exe:
+      self.exe = '_opam/{{0}}/bin/{0}'.format(exe)
+    else:
+      self.exe = '_build/{{0}}/macro/{0}/{1}.exe'.format(group, name)
+    self.args = args
+
+
 ALMABENCH = [
-  Benchmark(group='almabench', name='almabench', args=[['10']]),
+  Macro(group='almabench', name='almabench', args=[['10']]),
 ]
 
 BDD = [
-  Benchmark(group='bdd', name='bdd', args=[['26']]),
+  Macro(group='bdd', name='bdd', args=[['26']]),
 ]
 
 BENCHMARKSGAME = [
-  Benchmark(group='benchmarksgame', name='binarytrees5', args=[['20']]),
-  Benchmark(group='benchmarksgame', name='fannkuchredux2', args=[['11']]),
-  Benchmark(group='benchmarksgame', name='fannkuchredux', args=[['11']]),
-  Benchmark(group='benchmarksgame', name='fasta3'),
-  Benchmark(group='benchmarksgame', name='fasta6'),
-  Benchmark(group='benchmarksgame', name='knucleotide'),
-  Benchmark(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
-  Benchmark(group='benchmarksgame', name='nbody', args=[['100000000']]),
-  ##Benchmark(group='benchmarksgame', name='pidigits5'),
-  Benchmark(group='benchmarksgame', name='regexredux2'),
-  Benchmark(group='benchmarksgame', name='revcomp2'),
-  Benchmark(group='benchmarksgame', name='spectralnorm2'),
+  Macro(group='benchmarksgame', name='binarytrees5', args=[['20']]),
+  Macro(group='benchmarksgame', name='fannkuchredux2', args=[['11']]),
+  Macro(group='benchmarksgame', name='fannkuchredux', args=[['11']]),
+  Macro(group='benchmarksgame', name='fasta3'),
+  Macro(group='benchmarksgame', name='fasta6'),
+  Macro(group='benchmarksgame', name='knucleotide'),
+  Macro(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
+  Macro(group='benchmarksgame', name='nbody', args=[['100000000']]),
+  ##Macro(group='benchmarksgame', name='pidigits5'),
+  Macro(group='benchmarksgame', name='regexredux2'),
+  Macro(group='benchmarksgame', name='revcomp2'),
+  Macro(group='benchmarksgame', name='spectralnorm2'),
 ]
 
 CHAMENEOS = [
-  Benchmark(group='chameneos', name='chameneos_redux_lwt', args=[['600000']]),
+  Macro(group='chameneos', name='chameneos_redux_lwt', args=[['600000']]),
 ]
 
 KB = [
-  Benchmark(group='kb', name='kb', args=[[]]),
-  Benchmark(group='kb', name='kb_no_exc', args=[[]]),
+  Macro(group='kb', name='kb', args=[[]]),
+  Macro(group='kb', name='kb_no_exc', args=[[]]),
 ]
 
 NUMERICAL_ANALYSIS = [
-  Benchmark(group='numerical-analysis', name='durand_kerner_aberth', args=[
+  Macro(group='numerical-analysis', name='durand_kerner_aberth', args=[
     ['100']
   ]),
-  Benchmark(group='numerical-analysis', name='fft', args=[
+  Macro(group='numerical-analysis', name='fft', args=[
     ['1_048_576']
   ]),
-  Benchmark(group='numerical-analysis', name='levinson_durbin', args=[
+  Macro(group='numerical-analysis', name='levinson_durbin', args=[
     ['10_000']
   ]),
-  Benchmark(group='numerical-analysis', name='lu_decomposition', args=[
+  Macro(group='numerical-analysis', name='lu_decomposition', args=[
     []
   ]),
-  Benchmark(group='numerical-analysis', name='naive_multilayer', args=[
+  Macro(group='numerical-analysis', name='naive_multilayer', args=[
     []
   ]),
-  Benchmark(group='numerical-analysis', name='qr_decomposition', args=[
+  Macro(group='numerical-analysis', name='qr_decomposition', args=[
     []
   ]),
 ]
 
 MENHIR = [
-  Benchmark(
+  Macro(
       group='menhir',
       name='menhir',
       exe='menhir',
@@ -275,13 +275,13 @@ MENHIR = [
 ]
 
 SIMPLE_TESTS = [
-  Benchmark(group='simple-tests', name='alloc', args=[
+  Macro(group='simple-tests', name='alloc', args=[
     ['400_000']
   ]),
-  Benchmark(group='simple-tests', name='morestacks', args=[
+  Macro(group='simple-tests', name='morestacks', args=[
     ['1_000']
   ]),
-  Benchmark(group='simple-tests', name='stress', args=[
+  Macro(group='simple-tests', name='stress', args=[
     ["1", "10"],
     ["10000", "10"],
     ["100000", "10"],
@@ -298,7 +298,7 @@ SIMPLE_TESTS = [
     ["10000", "100"],
     ["100000", "100"],
   ]),
-  Benchmark(group='simple-tests', name='capi', args=[
+  Macro(group='simple-tests', name='capi', args=[
     ["test_no_args_alloc", "200_000_000"],
     ["test_no_args_noalloc", "200_000_000"],
     ["test_few_args_alloc", "200_000_000"],
@@ -306,13 +306,13 @@ SIMPLE_TESTS = [
     ["test_many_args_alloc", "200_000_000"],
     ["test_many_args_noalloc", "200_000_000"],
   ]),
-  Benchmark(group='simple-tests', name='stacks', args=[
+  Macro(group='simple-tests', name='stacks', args=[
     ["100000", "ints-small"],
     ["20000", "ints-large"],
     ["100000", "floats-small"],
     ["20000", "floats-large"],
   ]),
-  Benchmark(group='simple-tests', name='weakretain', args=[
+  Macro(group='simple-tests', name='weakretain', args=[
     ["25", "1000"],
     ["25", "100000"],
     ["25", "10000000"],
@@ -326,12 +326,12 @@ SIMPLE_TESTS = [
     ["100", "100000"],
     ["100", "10000000"],
   ]),
-  Benchmark(group='simple-tests', name='lazylist', args=[
+  Macro(group='simple-tests', name='lazylist', args=[
     ["100000", "100"],
     ["10000", "1000"],
     ["1000", "10000"],
   ]),
-  Benchmark(group='simple-tests', name='lists', args=[
+  Macro(group='simple-tests', name='lists', args=[
     ["int", "1"],
     ["int", "10000"],
     ["int", "100000"],
@@ -360,7 +360,7 @@ SIMPLE_TESTS = [
     ["int-option-array", "10000"],
     ["int-option-array", "100000"],
   ]),
-  Benchmark(group='simple-tests', name='finalise', args=[
+  Macro(group='simple-tests', name='finalise', args=[
     ["10"],
     ["20"],
     ["30"],
@@ -375,17 +375,17 @@ SIMPLE_TESTS = [
 ]
 
 STDLIB = [
-  Benchmark(group='stdlib', name='stack_bench', args=[
+  Macro(group='stdlib', name='stack_bench', args=[
     ["stack_fold", "2500000"],
     ["stack_push_pop", "100000000"],
   ]),
-  Benchmark(group='stdlib', name='array_bench', args=[
+  Macro(group='stdlib', name='array_bench', args=[
     ["array_forall", "1000", "100000"],
     ["array_fold", "1000", "100000"],
     ["array_iter", "1000", "100000"],
   ]),
 
-  Benchmark(group='stdlib', name='bytes_bench', args=[
+  Macro(group='stdlib', name='bytes_bench', args=[
     ["bytes_get", "100000000"],
     ["bytes_sub", "100000000"],
     ["bytes_blit", "2500000"],
@@ -399,12 +399,12 @@ STDLIB = [
     ["bytes_set", "1000000000"],
     ["bytes_cat", "1000000000"],
   ]),
-  Benchmark(group='stdlib', name='set_bench', args=[
+  Macro(group='stdlib', name='set_bench', args=[
     #["set_fold", "1000000"],
     ["set_add_rem", "20000000"],
     ["set_mem", "50000000"],
   ]),
-  Benchmark(group='stdlib', name='hashtbl_bench', args=[
+  Macro(group='stdlib', name='hashtbl_bench', args=[
     ["int_replace1", "10000"],
     ["int_find1", "20000"],
     ["caml_hash_int", "200000"],
@@ -420,7 +420,7 @@ STDLIB = [
     ["hashtbl_find", "6000000"],
     ["hashtbl_filter_map", "100000"],
   ]),
-  Benchmark(group='stdlib', name='string_bench', args=[
+  Macro(group='stdlib', name='string_bench', args=[
     ["string_get", "50000000"],
     ["string_sub", "50000000"],
     ["string_blit", "25000000"],
@@ -435,7 +435,7 @@ STDLIB = [
     ["string_compare", "10000"],
     ["string_equal", "25000"],
   ]),
-  Benchmark(group='stdlib', name='str_bench', args=[
+  Macro(group='stdlib', name='str_bench', args=[
     ["str_regexp", "1000000"],
     ["str_string_match", "50000000"],
     #["str_search_forward", "5000000"],
@@ -443,7 +443,7 @@ STDLIB = [
     ["str_global_replace", "1000000"],
     ["str_split", "2000000"],
   ]),
-  Benchmark(group='stdlib', name='pervasives_bench', args=[
+  Macro(group='stdlib', name='pervasives_bench', args=[
     ["pervasives_equal_lists", "1000000000"],
     ["pervasives_compare_lists", "100000000"],
     ["pervasives_equal_ints", "1000000000"],
@@ -453,7 +453,7 @@ STDLIB = [
     ["pervasives_equal_strings", "20000000"],
     ["pervasives_compare_strings", "20000000"],
   ]),
-  Benchmark(group='stdlib', name='map_bench', args=[
+  Macro(group='stdlib', name='map_bench', args=[
     ["map_iter", "10000"],
     ["map_add", "1000000"],
     ["map_add_duplicate", "1000000"],
@@ -463,21 +463,21 @@ STDLIB = [
     ["map_find", "1000000"],
     ["map_map", "10000"],
   ]),
-  Benchmark(group='stdlib', name='big_array_bench', args=[
+  Macro(group='stdlib', name='big_array_bench', args=[
     ["big_array_int_rev", "1024", "50000"],
     ["big_array_int32_rev", "1024", "50000"],
   ])
 ]
 
 SEQUENCE = [
-  Benchmark(group='sequence', name='sequence_cps', args=[['10000']])
+  Macro(group='sequence', name='sequence_cps', args=[['10000']])
 ]
 
 YOJSON = [
-  Benchmark(group='yojson', name='ydump', args=[['-c', 'sample.json']])
+  Macro(group='yojson', name='ydump', args=[['-c', 'sample.json']])
 ]
 
-BENCHMARKS =\
+MACRO_BENCHMARKS =\
   ALMABENCH +\
   BDD +\
   BENCHMARKSGAME +\
@@ -496,7 +496,7 @@ def _run_test(test):
   try:
     bench, switch, args = test
     exe = os.path.join(ROOT, bench.exe.format(switch))
-    with Chdir(os.path.join(ROOT, '_build', switch, 'benchmarks', bench.group)):
+    with Chdir(os.path.join(ROOT, '_build', switch, 'macro', bench.group)):
       task = subprocess.Popen(
           [exe] + args,
           stdout=subprocess.DEVNULL,
@@ -512,11 +512,11 @@ def _run_test(test):
   return bench, switch, args, result
 
 
-def benchmark_perf(n):
+def benchmark_macro(n):
   """Runs performance benchmarks."""
 
   all_tests = []
-  for _, bench, (switch, _) in itertools.product(range(n), BENCHMARKS, SWITCHES):
+  for _, bench, (switch, _) in itertools.product(range(n), MACRO_BENCHMARKS, SWITCHES):
     for args in bench.args:
       all_tests.append((bench, switch, args))
   random.shuffle(all_tests)
@@ -537,16 +537,19 @@ def benchmark_perf(n):
 
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)
-  with open(os.path.join(RESULT, 'perf'), 'w') as f:
+  with open(os.path.join(RESULT, 'macro'), 'w') as f:
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
 
-def benchmark_micro():
+MICRO_BENCHMARKS=[]
+
+
+def benchmark_micro(n):
   """Runs microbenchmarks."""
   pass
 
 if __name__ == '__main__':
   install()
-  benchmark_size()
-  benchmark_perf(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  benchmark_micro()
+  #benchmark_size()
+  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  benchmark_micro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)

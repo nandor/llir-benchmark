@@ -1,0 +1,8 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+
+(executable
+  (name bigarray_rev)
+  (libraries harness bigarray))
+
+(alias (name buildbench) (deps bigarray_rev.exe))

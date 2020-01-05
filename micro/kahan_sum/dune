@@ -1,0 +1,8 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+
+(executable
+  (name kahan_sum)
+  (libraries harness))
+
+(alias (name buildbench) (deps kahan_sum.exe))
