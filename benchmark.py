@@ -557,7 +557,6 @@ MICRO_BENCHMARKS=[
   Micro('fibonacci'),
   Micro('format'),
   Micro('hamming'),
-  Micro('harness'),
   Micro('kahan_sum'),
   Micro('kb'),
   Micro('lens'),
@@ -597,7 +596,7 @@ def benchmark_micro():
       if 'parameter' in line:
         test = prev.replace(' ', '_')
         continue
-      if not line or not prev:
+      if not line or not prev or 'group' in line:
         continue
       runs, _, nanos, _, _, _, _, _, _ = line.strip().split(' ')
       samples[("{}.{}".format(bench.name, test), switch)].append(float(nanos) / float(runs))
