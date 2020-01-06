@@ -562,7 +562,7 @@ MICRO_BENCHMARKS=[
   Micro('lens'),
   Micro('list'),
   Micro('nucleic'),
-  Micro('num_analyis'),
+  Micro('num_analysis'),
   Micro('sequence'),
   Micro('sieve'),
   Micro('vector_functor'),
@@ -590,15 +590,15 @@ def benchmark_micro():
   all_tests = list(itertools.product(MICRO_BENCHMARKS, SWITCHES))
   for bench, (switch, _) in tqdm(all_tests):
     result = _run_micro_test(bench.exe.format(switch))
-    lines = result.split('\n')
+    lines = [l.strip() for l in result.split('\n') if 'group' not in l]
     test = None
     for prev, line in zip(lines, lines[1:]):
       if 'parameter' in line:
         test = prev.replace(' ', '_')
         continue
-      if not line or not prev or 'group' in line:
+      if not line or not prev:
         continue
-      runs, _, nanos, _, _, _, _, _, _ = line.strip().split(' ')
+      runs, _, nanos, _, _, _, _, _, _ = line.split(' ')
       samples[("{}.{}".format(bench.name, test), switch)].append(float(nanos) / float(runs))
 
   perf = defaultdict(dict)

@@ -231,8 +231,7 @@ let mk_fold_left_add f = fun l -> f (+) 0 l
 
 let fold_left_add_group =
   Int_group
-    (["         type 'a t = elt array
-tail_rec", mk_fold_left_add fold_left;
+    (["tail_rec", mk_fold_left_add fold_left;
       "while", mk_fold_left_add fold_left_while;
       "while_exn", mk_fold_left_add fold_left_while_exn],
      prepare_fold_left_add,
