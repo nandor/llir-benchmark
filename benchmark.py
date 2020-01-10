@@ -673,6 +673,6 @@ def benchmark_micro():
 
 if __name__ == '__main__':
   install()
-  #benchmark_size()
-  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  #benchmark_micro()
+  benchmark_size()
+  benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  benchmark_micro()
