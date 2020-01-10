@@ -11,7 +11,7 @@ homepage: "https://github.com/ocaml/Zarith"
 bug-reports: "https://github.com/ocaml/Zarith/issues"
 dev-repo: "git+https://github.com/ocaml/Zarith.git"
 build: [
-  ["./configure"] {os != "openbsd" & os != "freebsd" & os != "macos"}
+  ["./configure" "-noasm"] {os != "openbsd" & os != "freebsd" & os != "macos"}
   [
     "sh"
     "-exc"

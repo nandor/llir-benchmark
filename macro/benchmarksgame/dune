@@ -1,17 +1,19 @@
-(executables
-  (names
-    binarytrees5
-    fannkuchredux2
-    fannkuchredux
-    fasta3
-    fasta6
-    knucleotide
-    mandelbrot6
-    nbody
-    regexredux2
-    revcomp2
-    spectralnorm2)
-  (libraries unix str))
+(executable (name binarytrees5) (modules binarytrees5))
+(executable (name fannkuchredux2) (modules fannkuchredux2))
+(executable (name fannkuchredux) (modules fannkuchredux))
+(executable (name fasta3) (modules fasta3))
+(executable (name fasta6) (modules fasta6))
+(executable (name knucleotide) (modules knucleotide))
+(executable (name mandelbrot6) (modules mandelbrot6))
+(executable (name nbody) (modules nbody))
+(executable (name regexredux2) (modules regexredux2) (libraries str))
+(executable (name revcomp2) (modules revcomp2))
+(executable (name spectralnorm2) (modules spectralnorm2))
+
+(executable
+  (name pidigits5)
+  (modules pidigits5)
+  (libraries zarith))
 
 (rule
   (targets knucleotide-input.txt)
@@ -29,6 +31,7 @@
     knucleotide.exe
     mandelbrot6.exe
     nbody.exe
+    pidigits5.exe
     regexredux2.exe
     revcomp2.exe
     spectralnorm2.exe

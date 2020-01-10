@@ -15,20 +15,38 @@ from tqdm import tqdm
 
 
 
+# List of C packages to install.
+LIBRARIES=[
+  (
+    'gmp',
+    'https://github.com/nandor/gmp-genm',
+    [
+      [
+        './configure',
+        '--prefix', '{prefix}',
+        '-cc', '{cc}',
+        '-ar', '{ar}'
+      ],
+      [ 'make' ],
+      [ 'make', 'install' ]
+    ]
+  )
+]
+
 # List of all packages to install.
 PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
   "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
-  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes",
+  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith"
 ]
 
 # List of all switches to evaluate.
 SWITCHES=[
-  ("4.07.1+static", ['-cc', 'musl-gcc']),
-  ("4.07.1+genm+O0", ['--target', 'genm', '-O0']),
-  ("4.07.1+genm+O1", ['--target', 'genm', '-O1']),
-  ("4.07.1+genm+O2", ['--target', 'genm', '-O2']),
-  ("4.07.1+genm+O3", ['--target', 'genm', '-O3']),
+  ("4.07.1+static", (['-cc', 'musl-gcc'], 'musl-gcc', 'ar')),
+  ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O3", (['--target', 'genm', '-O3'], 'genm-gcc', 'genm-ar')),
 ]
 
 # opam file to generate for the compiler versions.
@@ -75,6 +93,10 @@ def opam(*args):
 
   env = os.environ.copy()
   env['OPAMROOT'] = OPAMROOT
+  env['PATH'] = '{prefix}/dist/bin:{prefix}/dist/musl/bin:{path}'.format(
+      prefix=os.getenv('PREFIX'),
+      path=os.getenv('PATH')
+  )
 
   proc = subprocess.Popen(
       ['opam'] + list(args),
@@ -91,6 +113,23 @@ def opam(*args):
   return stdout.decode('utf-8')
 
 
+def run_command(*args, **kwargs):
+  """Runs a command."""
+
+  proc = subprocess.Popen(
+      list(args),
+      stdout=subprocess.DEVNULL,
+      stderr=subprocess.PIPE,
+      **kwargs
+  )
+
+  _, stderr = proc.communicate()
+  if proc.returncode != 0:
+      print('"opam {}" failed:\n'.format(' '.join(args)))
+      print(stderr.decode('utf-8'))
+      sys.exit(1)
+
+
 def install():
   """Installs the switches and the required packages."""
 
@@ -102,7 +141,7 @@ def install():
 
   # Set up the opam files for the switches.
   pkg_dir = os.path.join(ROOT, 'dependencies', 'packages', 'ocaml-base-compiler')
-  for switch, args in SWITCHES:
+  for switch, (args, _, _) in SWITCHES:
     ver_dir = os.path.join(pkg_dir, 'ocaml-base-compiler.{}'.format(switch))
     if not os.path.exists(ver_dir):
       os.makedirs(ver_dir)
@@ -132,9 +171,30 @@ def install():
           'ocaml-base-compiler.{}'.format(switch)
       )
 
+  # Install all libraries.
+  for switch, (_, cc, ar) in SWITCHES:
+    for name, repo, cmds in LIBRARIES:
+      prefix = os.path.join(OPAMROOT, switch)
+      build_dir = os.path.join(prefix, '.opam-switch', 'build', name)
+      if not os.path.exists(build_dir):
+        run_command('git', 'clone', repo, build_dir)
+        for cmd in cmds:
+          rendered_cmd = [c.format(
+            prefix = prefix,
+            cc = cc,
+            ar = ar
+          ) for c in cmd]
+          run_command(*rendered_cmd, cwd=build_dir)
+
   # Install all packages.
   for switch, _ in SWITCHES:
-    opam('install', '--switch={}'.format(switch), '--yes', *PACKAGES)
+    opam(
+        'install',
+        '--switch={}'.format(switch),
+        '--keep-build-dir',
+        '--yes',
+        *PACKAGES
+    )
 
   # Build all benchmarks.
   opam(
@@ -228,7 +288,7 @@ BENCHMARKSGAME = [
   Macro(group='benchmarksgame', name='knucleotide'),
   Macro(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
   Macro(group='benchmarksgame', name='nbody', args=[['100000000']]),
-  ##Macro(group='benchmarksgame', name='pidigits5'),
+  Macro(group='benchmarksgame', name='pidigits5', args=[['27']]),
   Macro(group='benchmarksgame', name='regexredux2'),
   Macro(group='benchmarksgame', name='revcomp2'),
   Macro(group='benchmarksgame', name='spectralnorm2'),
@@ -613,6 +673,6 @@ def benchmark_micro():
 
 if __name__ == '__main__':
   install()
-  benchmark_size()
-  benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  benchmark_micro()
+  #benchmark_size()
+  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  #benchmark_micro()
