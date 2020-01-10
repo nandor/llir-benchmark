@@ -288,7 +288,7 @@ BENCHMARKSGAME = [
   Macro(group='benchmarksgame', name='knucleotide'),
   Macro(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
   Macro(group='benchmarksgame', name='nbody', args=[['100000000']]),
-  Macro(group='benchmarksgame', name='pidigits5', args=[['27']]),
+  Macro(group='benchmarksgame', name='pidigits5', args=[['5000']]),
   Macro(group='benchmarksgame', name='regexredux2'),
   Macro(group='benchmarksgame', name='revcomp2'),
   Macro(group='benchmarksgame', name='spectralnorm2'),
