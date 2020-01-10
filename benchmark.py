@@ -13,7 +13,10 @@ import statistics
 from collections import defaultdict
 from tqdm import tqdm
 
-
+ROOT=os.path.dirname(os.path.realpath(__file__))
+OPAMROOT=os.path.join(ROOT, '_opam')
+RESULT=os.path.join(ROOT, '_result')
+CPU_COUNT=multiprocessing.cpu_count()
 
 # List of C packages to install.
 LIBRARIES=[
@@ -27,7 +30,7 @@ LIBRARIES=[
         '-cc', '{cc}',
         '-ar', '{ar}'
       ],
-      [ 'make' ],
+      [ 'make', '-j', str(CPU_COUNT) ],
       [ 'make', 'install' ]
     ]
   )
@@ -84,9 +87,6 @@ url {{
 }}
 """
 
-ROOT=os.path.dirname(os.path.realpath(__file__))
-OPAMROOT=os.path.join(ROOT, '_opam')
-RESULT=os.path.join(ROOT, '_result')
 
 def opam(*args):
   """Run the opam process and capture its output."""
@@ -582,7 +582,7 @@ def benchmark_macro(n):
       all_tests.append((bench, switch, args))
   random.shuffle(all_tests)
 
-  pool = multiprocessing.Pool(int(multiprocessing.cpu_count() * 0.75))
+  pool = multiprocessing.Pool(int(CPU_COUNT * 0.75))
   perf = defaultdict(lambda: defaultdict(list))
   failed = []
   for bench, switch, args, r in tqdm(pool.imap_unordered(_run_macro_test, all_tests), total=len(all_tests)):
