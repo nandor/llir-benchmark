@@ -454,7 +454,7 @@ STDLIB = [
     ["bytes_iter", "10_000_000"],
     ["bytes_map", "10_000_000"],
     ["bytes_trim", "20_500_000"],
-    ["bytes_index", "100_000_000"],
+    ["bytes_index", "10_000_000"],
     ["bytes_contains", "100_000_000"],
     ["bytes_uppercase_ascii", "1_000_000"],
     ["bytes_set", "1_000_000_000"],
