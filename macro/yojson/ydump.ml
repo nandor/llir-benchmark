@@ -170,7 +170,7 @@ let () =
     parse_cmdline () in
   let success =
     let rec aux cpt b =
-      if cpt = 100
+      if cpt = 500
       then b
       else 
         let b = 
