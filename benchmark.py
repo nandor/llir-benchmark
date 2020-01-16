@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
+import random
+import argparse
 import contextlib
 import itertools
 import json
 import multiprocessing
 import os
-import random
 import subprocess
 import sys
 import statistics
@@ -125,7 +126,7 @@ def run_command(*args, **kwargs):
       sys.exit(1)
 
 
-def install():
+def install(jb):
   """Installs the switches and the required packages."""
 
   # Set up the workspace file.
@@ -162,6 +163,7 @@ def install():
           'create',
           '--keep-build-dir',
           '--yes',
+          '-j', str(jb),
           switch,
           'ocaml-base-compiler.{}'.format(switch)
       )
@@ -173,6 +175,7 @@ def install():
         '--switch={}'.format(switch),
         '--keep-build-dir',
         '--yes',
+        '-j', str(jb),
         *PACKAGES,
         cc=cc,
         ar=ar,
@@ -185,6 +188,7 @@ def install():
       '--',
       'dune',
       'build',
+      '-j', str(jb),
       '--profile=release',
       '--workspace=dune-workspace',
       '@buildbench'
@@ -536,13 +540,20 @@ MACRO_BENCHMARKS =\
 
 def _run_macro_test(test):
   """Helper to run a single test."""
+  
+  cpu = multiprocessing.current_process()._identity[0] % CPU_COUNT
+  
   result = None
   try:
     bench, switch, args = test
     exe = os.path.join(ROOT, bench.exe.format(switch))
     with Chdir(os.path.join(ROOT, '_build', switch, 'macro', bench.group)):
-      task = subprocess.Popen(
-          [exe] + args,
+      task = subprocess.Popen([
+            'taskset',
+            '--cpu-list',
+            str(cpu),
+            exe
+          ] + args,
           stdout=subprocess.DEVNULL,
           stderr=subprocess.DEVNULL
       )
@@ -556,16 +567,16 @@ def _run_macro_test(test):
   return bench, switch, args, result
 
 
-def benchmark_macro(n):
+def benchmark_macro(n, jt):
   """Runs performance benchmarks."""
 
   all_tests = []
   for _, bench, (switch, _) in itertools.product(range(n), MACRO_BENCHMARKS, SWITCHES):
     for args in bench.args:
       all_tests.append((bench, switch, args))
-  random.shuffle(all_tests)
+  random.shuffle(all_tests)    
 
-  pool = multiprocessing.Pool(int(CPU_COUNT * 0.75))
+  pool = multiprocessing.Pool(jt)
   perf = defaultdict(lambda: defaultdict(list))
   failed = []
   for bench, switch, args, r in tqdm(pool.imap_unordered(_run_macro_test, all_tests), total=len(all_tests)):
@@ -655,7 +666,13 @@ def benchmark_micro():
 
 
 if __name__ == '__main__':
-  install()
-  #benchmark_size()
-  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  #benchmark_micro()
+  parser = argparse.ArgumentParser(description='GenM OCaml benchmark suite')
+  parser.add_argument('-n', type=int, default=25, action='store')
+  parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
+  parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
+  args = parser.parse_args()
+
+  install(args.jb)
+  benchmark_size()
+  benchmark_macro(args.n, args.jt)
+  benchmark_micro()
