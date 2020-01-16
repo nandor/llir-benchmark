@@ -18,24 +18,6 @@ OPAMROOT=os.path.join(ROOT, '_opam')
 RESULT=os.path.join(ROOT, '_result')
 CPU_COUNT=multiprocessing.cpu_count()
 
-# List of C packages to install.
-LIBRARIES=[
-  (
-    'gmp',
-    'https://github.com/nandor/gmp-genm',
-    [
-      [
-        './configure',
-        '--prefix', '{prefix}',
-        '-cc', '{cc}',
-        '-ar', '{ar}'
-      ],
-      [ 'make', '-j', str(CPU_COUNT) ],
-      [ 'make', 'install' ]
-    ]
-  )
-]
-
 # List of all packages to install.
 PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
@@ -88,7 +70,7 @@ url {{
 """
 
 
-def opam(*args):
+def opam(*args, **kwargs):
   """Run the opam process and capture its output."""
 
   env = os.environ.copy()
@@ -97,6 +79,19 @@ def opam(*args):
       prefix=os.getenv('PREFIX'),
       path=os.getenv('PATH')
   )
+  if 'cc' in kwargs:
+    env['CC'] = kwargs['cc']
+  if 'ar' in kwargs:
+    env['AR'] = kwargs['ar']
+  if 'prefix' in kwargs:
+    env['CFLAGS'] = '{cflags} -I{prefix}/include'.format(
+      cflags=env.get('CFLAGS', ''),
+      prefix=kwargs['prefix']
+    )
+    env['LDFLAGS'] = '{ldflags} -L{prefix}/lib'.format(
+      ldflags=env.get('LDFLAGS', ''),
+      prefix=kwargs['prefix']
+    )
 
   proc = subprocess.Popen(
       ['opam'] + list(args),
@@ -171,29 +166,17 @@ def install():
           'ocaml-base-compiler.{}'.format(switch)
       )
 
-  # Install all libraries.
-  for switch, (_, cc, ar) in SWITCHES:
-    for name, repo, cmds in LIBRARIES:
-      prefix = os.path.join(OPAMROOT, switch)
-      build_dir = os.path.join(prefix, '.opam-switch', 'build', name)
-      if not os.path.exists(build_dir):
-        run_command('git', 'clone', repo, build_dir)
-        for cmd in cmds:
-          rendered_cmd = [c.format(
-            prefix = prefix,
-            cc = cc,
-            ar = ar
-          ) for c in cmd]
-          run_command(*rendered_cmd, cwd=build_dir)
-
   # Install all packages.
-  for switch, _ in SWITCHES:
+  for switch, (_, cc, ar) in SWITCHES:
     opam(
         'install',
         '--switch={}'.format(switch),
         '--keep-build-dir',
         '--yes',
-        *PACKAGES
+        *PACKAGES,
+        cc=cc,
+        ar=ar,
+        prefix=os.path.join(OPAMROOT, switch)
     )
 
   # Build all benchmarks.
@@ -673,6 +656,6 @@ def benchmark_micro():
 
 if __name__ == '__main__':
   install()
-  benchmark_size()
-  benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
-  benchmark_micro()
+  #benchmark_size()
+  #benchmark_macro(int(sys.argv[1]) if len(sys.argv) > 1 else 25)
+  #benchmark_micro()

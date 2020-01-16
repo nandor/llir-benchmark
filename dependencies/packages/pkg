@@ -1,2 +1,0 @@
-mkdir -p $1
-cp -R /home/nl364/.opam/repo/default/packages/$1/$1.$2 $1
