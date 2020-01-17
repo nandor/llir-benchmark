@@ -28,7 +28,7 @@ PACKAGES=[
 
 # List of all switches to evaluate.
 SWITCHES=[
-  ("4.07.1+static", (['-cc', 'musl-gcc'], 'musl-gcc', 'ar')),
+  ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
   ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
@@ -540,9 +540,9 @@ MACRO_BENCHMARKS =\
 
 def _run_macro_test(test):
   """Helper to run a single test."""
-  
+
   cpu = multiprocessing.current_process()._identity[0] % CPU_COUNT
-  
+
   result = None
   try:
     bench, switch, args = test
@@ -574,7 +574,7 @@ def benchmark_macro(n, jt):
   for _, bench, (switch, _) in itertools.product(range(n), MACRO_BENCHMARKS, SWITCHES):
     for args in bench.args:
       all_tests.append((bench, switch, args))
-  random.shuffle(all_tests)    
+  random.shuffle(all_tests)
 
   pool = multiprocessing.Pool(jt)
   perf = defaultdict(lambda: defaultdict(list))
