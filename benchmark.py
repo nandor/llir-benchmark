@@ -476,7 +476,6 @@ STDLIB = [
     ["string_sub", "50000000"],
     ["string_blit", "25000000"],
     ["string_concat", "20000000"],
-    ["string_iter", "10_000_000"],
     ["string_map", "20000000"],
     ["string_trim", "100_000_000"],
     ["string_index", "250_000_000"],
