@@ -4,6 +4,8 @@ import random
 import argparse
 import contextlib
 import itertools
+import math
+import numpy as np
 import json
 import multiprocessing
 import os
@@ -11,6 +13,7 @@ import subprocess
 import sys
 import statistics
 
+from sklearn import linear_model, datasets
 from collections import defaultdict
 from tqdm import tqdm
 
@@ -278,7 +281,7 @@ BENCHMARKSGAME = [
   Macro(group='benchmarksgame', name='pidigits5', args=[['5000']]),
   Macro(group='benchmarksgame', name='regexredux2'),
   Macro(group='benchmarksgame', name='revcomp2'),
-  Macro(group='benchmarksgame', name='spectralnorm2'),
+  Macro(group='benchmarksgame', name='spectralnorm2', args=[['2000']]),
 ]
 
 CHAMENEOS = [
@@ -453,20 +456,20 @@ STDLIB = [
     ["set_mem", "50000000"],
   ]),
   Macro(group='stdlib', name='hashtbl_bench', args=[
-    ["int_replace1", "50_000"],
+    ["int_replace1", "100_000"],
     ["int_find1", "200_000"],
-    ["caml_hash_int", "200000"],
-    ["caml_hash_tuple", "100000"],
-    ["int_replace2", "100000"],
-    ["int_find2", "300000"],
-    ["hashtbl_iter", "200000"],
-    ["hashtbl_fold", "200000"],
-    ["hashtbl_add_resizing", "4000000"],
-    ["hashtbl_add_sized", "6000000"],
-    ["hashtbl_add_duplicate", "2000000"],
+    ["caml_hash_int", "200_000"],
+    ["caml_hash_tuple", "100_000"],
+    ["int_replace2", "100_000"],
+    ["int_find2", "500_000"],
+    ["hashtbl_iter", "200_000"],
+    ["hashtbl_fold", "200_000"],
+    ["hashtbl_add_resizing", "4_000_000"],
+    ["hashtbl_add_sized", "6_000_000"],
+    ["hashtbl_add_duplicate", "2_000_000"],
     ["hashtbl_remove", "40_000_000"],
     ["hashtbl_find", "60_000_000"],
-    ["hashtbl_filter_map", "100000"],
+    ["hashtbl_filter_map", "100_000"],
   ]),
   Macro(group='stdlib', name='string_bench', args=[
     ["string_get", "50_000_000"],
@@ -512,8 +515,8 @@ STDLIB = [
     ["map_map", "10_000"],
   ]),
   Macro(group='stdlib', name='big_array_bench', args=[
-    ["big_array_int_rev", "1024", "50000"],
-    ["big_array_int32_rev", "1024", "50000"],
+    ["big_array_int_rev", "1024", "200_000"],
+    ["big_array_int32_rev", "1024", "200_000"],
   ])
 ]
 
@@ -626,7 +629,7 @@ def _run_micro_test(exe):
   """Runs a micro benchmark and captures its output."""
 
   p = subprocess.Popen(
-      [exe, "--longer", "--stabilize-gc"],
+      [exe, "--longer", "--stabilize-gc", '-n', '2', '--time-quota', '60'],
       stdout=subprocess.PIPE,
       stderr=subprocess.DEVNULL
   )
@@ -637,27 +640,44 @@ def _run_micro_test(exe):
   return out.decode("utf-8")
 
 
+def _fit(samples):
+  x = np.array([x for x, _ in samples])
+  y = np.array([y for _, y in samples])
+
+  ransac = linear_model.RANSACRegressor(residual_threshold=10000)
+  ransac.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+  return ransac.estimator_.coef_[0][0]
+
+
 def benchmark_micro():
   """Runs microbenchmarks."""
 
-  samples = defaultdict(list)
+  perf = defaultdict(dict)
   all_tests = list(itertools.product(MICRO_BENCHMARKS, SWITCHES))
   for bench, (switch, _) in tqdm(all_tests):
+
+    micro_dir = os.path.join(RESULT, 'log')
+    bench_log = os.path.join(micro_dir, '{}.{}'.format(bench.name, switch))
+    if not os.path.exists(micro_dir):
+      os.makedirs(micro_dir)
+
     result = _run_micro_test(bench.exe.format(switch))
-    lines = [l.strip() for l in result.split('\n') if 'group' not in l]
+    with open(bench_log, 'w') as f:
+      f.write(result)
+
+    lines = [l.strip() for l in result.split('\n') if l.strip()]
+
+    data = defaultdict(list)
     test = None
-    for prev, line in zip(lines, lines[1:]):
-      if 'parameter' in line:
-        test = prev.replace(' ', '_')
-        continue
-      if not line or not prev:
+    for line in lines:
+      if 'name' in line:
+        test = line.split(':')[1].strip().replace(' ', '_')
         continue
       runs, _, nanos, _, _, _, _, _, _ = line.split(' ')
-      samples[("{}.{}".format(bench.name, test), switch)].append(float(nanos) / float(runs))
-
-  perf = defaultdict(dict)
-  for (name, switch), ratios in samples.items():
-    perf[name][switch] = statistics.median(ratios)
+      data[test].append((float(runs), float(nanos)))
+    for test, ratios in data.items():
+      bench_name = '{}.{}'.format(bench.name, test)
+      perf[bench_name][switch] = _fit(list(ratios))
 
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)

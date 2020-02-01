@@ -281,25 +281,22 @@ module Measurement = struct
   }
 
   let output oc t =
+    output_string oc "name: ";
     output_string oc t.name;
-    output_char oc '\n';
     (match t.group with
      | None -> ()
      | Some group ->
-       output_string oc "group: ";
-       output_string oc group;
-       output_char oc '\n');
+        output_string oc group
+     );
     (match t.parameter with
      | None -> ()
      | Some parameter ->
-       output_string oc "parameter: ";
-       output_string oc (string_of_int parameter);
-       output_char oc '\n');
+       output_string oc (string_of_int parameter)
+     );
     output_char oc '\n';
     for i = 0 to t.sample_count - 1 do
       Measurement_sample.output oc t.samples.(i);
     done;
-    output_char oc '\n'
 
 end
 
