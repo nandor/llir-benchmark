@@ -536,6 +536,21 @@ ZARITH = [
   Macro(group='zarith', name='zarith_tak',  args=[['Z', '2500']]),
 ]
 
+MINILIGHT = [
+  Macro(group='minilight', name='minilight', exe='minilight-ocaml', args=[
+    ['roomfront.ml.txt']
+  ])
+]
+
+JS_OF_OCAML = [
+  Macro(group='js_of_ocaml', name='js_of_ocaml', exe='js_of_ocaml', args=[
+    ['{bin}/ocamlopt.byte', '-o', 'out.js'],
+    ['{bin}/ocamlc.byte', '-o', 'out.js'],
+    ['{bin}/ocamllex.byte', '-o', 'out.js'],
+    ['{bin}/ocamldep.byte', '-o', 'out.js']
+  ])
+]
+
 MACRO_BENCHMARKS =\
   ALMABENCH +\
   BDD +\
@@ -547,8 +562,9 @@ MACRO_BENCHMARKS =\
   SIMPLE_TESTS +\
   STDLIB +\
   YOJSON +\
-  ZARITH
-
+  ZARITH +\
+  MINILIGHT +\
+  JS_OF_OCAML
 
 def _run_macro_test(test):
   """Helper to run a single test."""
@@ -559,17 +575,25 @@ def _run_macro_test(test):
   try:
     bench, switch, args = test
     exe = os.path.join(ROOT, bench.exe.format(switch))
-    with Chdir(os.path.join(ROOT, '_build', switch, 'macro', bench.group)):
-      task = subprocess.Popen([
-            'taskset',
-            '--cpu-list',
-            str(cpu),
-            exe
-          ] + args,
-          stdout=subprocess.DEVNULL,
-          stderr=subprocess.DEVNULL
-      )
-      child_pid, status, rusage = os.wait4(task.pid, 0)
+    bin_dir = os.path.join(ROOT, '_opam', switch, 'bin')
+
+    cwd = os.path.join(ROOT, '_build', switch, 'macro', bench.group)
+    if not os.path.exists(cwd):
+      os.makedirs(cwd)
+
+    args = [arg.format(bin=bin_dir) for arg in args]
+
+    task = subprocess.Popen([
+          'taskset',
+          '--cpu-list',
+          str(cpu),
+          exe
+        ] + args,
+        cwd=cwd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    child_pid, status, rusage = os.wait4(task.pid, 0)
 
     if status == 0:
       result = (rusage.ru_utime, rusage.ru_maxrss)
@@ -638,7 +662,7 @@ def _run_micro_test(exe):
   """Runs a micro benchmark and captures its output."""
 
   p = subprocess.Popen(
-      [exe, "--longer", "--stabilize-gc", '-n', '2', '--time-quota', '60'],
+      [exe, "--longer", "--stabilize-gc", '--time-quota', '60'],
       stdout=subprocess.PIPE,
       stderr=subprocess.DEVNULL
   )
