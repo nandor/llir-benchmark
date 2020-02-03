@@ -26,7 +26,7 @@ CPU_COUNT=multiprocessing.cpu_count()
 PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
   "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
-  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith"
+  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
 ]
 
 # List of all switches to evaluate.
@@ -320,9 +320,11 @@ MENHIR = [
       name='menhir',
       exe='menhir',
       args=[
-        ['-v', '--table', 'sysver.mly']
+        ['-v', '--table', 'sysver.mly'],
+        ['ocaml.mly', '--list-errors', '-la', '2', '--no-stdlib', '--lalr'],
+        ['-v', '-t', 'keywords.mly', 'sql-parser.mly', '--base', 'sql-parser']
       ]
-  )
+  ),
 ]
 
 SIMPLE_TESTS = [
@@ -527,6 +529,13 @@ YOJSON = [
   Macro(group='yojson', name='ydump', args=[['-c', 'sample.json']])
 ]
 
+ZARITH = [
+  Macro(group='zarith', name='zarith_fact', args=[['40', '4_000_000']]),
+  Macro(group='zarith', name='zarith_fib',  args=[['Z', '40']]),
+  Macro(group='zarith', name='zarith_pi',   args=[['5000']]),
+  Macro(group='zarith', name='zarith_tak',  args=[['Z', '2500']]),
+]
+
 MACRO_BENCHMARKS =\
   ALMABENCH +\
   BDD +\
@@ -537,7 +546,8 @@ MACRO_BENCHMARKS =\
   MENHIR +\
   SIMPLE_TESTS +\
   STDLIB +\
-  YOJSON
+  YOJSON +\
+  ZARITH
 
 
 def _run_macro_test(test):
@@ -686,7 +696,7 @@ def benchmark_micro():
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='GenM OCaml benchmark suite')
-  parser.add_argument('-n', type=int, default=25, action='store')
+  parser.add_argument('-n', type=int, default=5, action='store')
   parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
   args = parser.parse_args()
