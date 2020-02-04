@@ -581,14 +581,12 @@ def _run_macro_test(test):
     if not os.path.exists(cwd):
       os.makedirs(cwd)
 
-    args = [arg.format(bin=bin_dir) for arg in args]
-
     task = subprocess.Popen([
           'taskset',
           '--cpu-list',
           str(cpu),
           exe
-        ] + args,
+        ] + [arg.format(bin=bin_dir) for arg in args],
         cwd=cwd,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL
