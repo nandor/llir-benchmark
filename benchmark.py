@@ -185,7 +185,7 @@ def install(jb):
         ar=ar,
         prefix=os.path.join(OPAMROOT, switch)
     )
-  return
+  
   # Build all benchmarks.
   opam(
       'exec',
@@ -590,6 +590,7 @@ MACRO_BENCHMARKS =\
   JSONM +\
   CPDF +\
   NBCODEC
+
 
 def _run_macro_test(test):
   """Helper to run a single test."""
