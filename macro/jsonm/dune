@@ -1,0 +1,2 @@
+
+(alias (name buildbench) (deps sample.json))

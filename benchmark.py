@@ -27,6 +27,7 @@ PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
   "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
   "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
+  "jsonm", "cpdf"
 ]
 
 # List of all switches to evaluate.
@@ -551,6 +552,21 @@ JS_OF_OCAML = [
   ])
 ]
 
+JSONM = [
+  Macro(group='jsonm', name='jsonm', exe='jsontrip', args=[
+    ['sample.json']
+  ])
+]
+
+CPDF = [
+  Macro(group='cpdf', name='cpdf', exe='cpdf', args=[
+    ['-merge', 'PDFReference16.pdf_toobig', 'metro_geo.pdf', '-o', '/dev/null'],
+    ['scale-to-fit', 'a4landscape', '-twoup', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
+    ['-squeeze', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
+    ['-blacktext', 'metro_geo.pdf', '-o', '/dev/null'],
+  ])
+]
+
 MACRO_BENCHMARKS =\
   ALMABENCH +\
   BDD +\
@@ -564,7 +580,9 @@ MACRO_BENCHMARKS =\
   YOJSON +\
   ZARITH +\
   MINILIGHT +\
-  JS_OF_OCAML
+  JS_OF_OCAML +\
+  JSONM +\
+  CPDF
 
 def _run_macro_test(test):
   """Helper to run a single test."""
