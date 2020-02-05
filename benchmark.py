@@ -27,7 +27,7 @@ PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
   "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
   "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  "jsonm", "cpdf"
+  "jsonm", "cpdf", "nbcodec"
 ]
 
 # List of all switches to evaluate.
@@ -185,7 +185,7 @@ def install(jb):
         ar=ar,
         prefix=os.path.join(OPAMROOT, switch)
     )
-
+  return
   # Build all benchmarks.
   opam(
       'exec',
@@ -567,6 +567,12 @@ CPDF = [
   ])
 ]
 
+NBCODEC=[
+  Macro(group='nbcodec', name='nbcodec', exe='setrip', args=[
+    ['-enc', '-rseed', '1067894368', '-maxd', '10', '-maxl', '55']
+  ])
+]
+
 MACRO_BENCHMARKS =\
   ALMABENCH +\
   BDD +\
@@ -582,7 +588,8 @@ MACRO_BENCHMARKS =\
   MINILIGHT +\
   JS_OF_OCAML +\
   JSONM +\
-  CPDF
+  CPDF +\
+  NBCODEC
 
 def _run_macro_test(test):
   """Helper to run a single test."""
