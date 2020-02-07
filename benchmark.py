@@ -33,16 +33,21 @@ PACKAGES=[
 # List of all switches to evaluate.
 SWITCHES=[
   ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
+  ("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
   ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O0+lto", (['--target', 'genm', '-O0', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O1+lto", (['--target', 'genm', '-O1', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O2+lto", (['--target', 'genm', '-O2', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O3", (['--target', 'genm', '-O3'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+genm+O3+lto", (['--target', 'genm', '-O3', '-lto'], 'genm-gcc', 'genm-ar')),
 ]
 
 # opam file to generate for the compiler versions.
 OPAM="""opam-version: "2.0"
 version: "4.07.1+genm"
-synopsis: "4.07.01 with the genm backend"
+synopsis: "4.07.1 with the genm backend"
 maintainer: "n@ndor.email"
 authors: "n@ndor.email"
 homepage: "https://github.com/nandor/ocaml-genm"
@@ -185,7 +190,7 @@ def install(jb):
         ar=ar,
         prefix=os.path.join(OPAMROOT, switch)
     )
-  
+
   # Build all benchmarks.
   opam(
       'exec',
