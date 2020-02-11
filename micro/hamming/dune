@@ -5,4 +5,4 @@
   (name hamming)
   (libraries harness))
 
-(alias (name buildbench) (deps hamming.exe))
+(alias (name build_micro) (deps hamming.exe))

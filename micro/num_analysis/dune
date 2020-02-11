@@ -5,4 +5,4 @@
   (name num_analysis)
   (libraries harness))
 
-(alias (name buildbench) (deps num_analysis.exe))
+(alias (name build_micro) (deps num_analysis.exe))

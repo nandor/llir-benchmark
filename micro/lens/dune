@@ -5,4 +5,4 @@
   (name lens)
   (libraries harness))
 
-(alias (name buildbench) (deps lens.exe))
+(alias (name build_micro) (deps lens.exe))

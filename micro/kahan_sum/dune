@@ -5,4 +5,4 @@
   (name kahan_sum)
   (libraries harness))
 
-(alias (name buildbench) (deps kahan_sum.exe))
+(alias (name build_micro) (deps kahan_sum.exe))

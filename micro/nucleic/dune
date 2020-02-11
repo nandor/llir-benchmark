@@ -5,4 +5,4 @@
   (name nucleic)
   (libraries harness))
 
-(alias (name buildbench) (deps nucleic.exe))
+(alias (name build_micro) (deps nucleic.exe))

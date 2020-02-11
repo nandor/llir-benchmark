@@ -5,4 +5,4 @@
   (name bdd)
   (libraries harness))
 
-(alias (name buildbench) (deps bdd.exe))
+(alias (name build_micro) (deps bdd.exe))

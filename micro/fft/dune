@@ -5,4 +5,4 @@
   (name fft)
   (libraries harness))
 
-(alias (name buildbench) (deps fft.exe))
+(alias (name build_micro) (deps fft.exe))

@@ -12,7 +12,7 @@
  (name naive_multilayer)
  (modules naive_multilayer naive_multilayer_dataset))
 
-(alias (name buildbench)
+(alias (name build_macro)
  (deps
    durand_kerner_aberth.exe
    fft.exe

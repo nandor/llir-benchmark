@@ -21,7 +21,7 @@
     (names ocamlcapi)))
 
 (alias
-  (name buildbench)
+  (name build_macro)
   (deps
     alloc.exe
     lists.exe

@@ -21,7 +21,7 @@
   (action (with-stdout-to %{targets} (run %{prog} 1_000_000 > %{targets}))))
 
 (alias
-  (name buildbench)
+  (name build_macro)
   (deps
     binarytrees5.exe
     fannkuchredux2.exe

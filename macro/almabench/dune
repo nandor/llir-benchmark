@@ -4,4 +4,4 @@
 (executable
  (name almabench))
 
-(alias (name buildbench) (deps almabench.exe))
+(alias (name build_macro) (deps almabench.exe))

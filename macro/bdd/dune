@@ -3,4 +3,4 @@
 (executable
  (name bdd))
 
-(alias (name buildbench) (deps bdd.exe))
+(alias (name build_macro) (deps bdd.exe))

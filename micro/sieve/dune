@@ -5,4 +5,4 @@
   (name sieve)
   (libraries harness))
 
-(alias (name buildbench) (deps sieve.exe))
+(alias (name build_micro) (deps sieve.exe))

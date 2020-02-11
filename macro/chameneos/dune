@@ -4,4 +4,4 @@
  (name chameneos_redux_lwt)
  (libraries lwt.unix))
 
-(alias (name buildbench) (deps chameneos_redux_lwt.exe))
+(alias (name build_macro) (deps chameneos_redux_lwt.exe))

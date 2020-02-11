@@ -5,4 +5,4 @@
   (name bigarray_rev)
   (libraries harness bigarray))
 
-(alias (name buildbench) (deps bigarray_rev.exe))
+(alias (name build_micro) (deps bigarray_rev.exe))

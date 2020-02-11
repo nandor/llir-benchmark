@@ -5,4 +5,4 @@
   (name fibonacci)
   (libraries harness))
 
-(alias (name buildbench) (deps fibonacci.exe))
+(alias (name build_micro) (deps fibonacci.exe))

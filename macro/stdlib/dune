@@ -18,7 +18,7 @@
   (libraries str))
 
 (alias
-  (name buildbench)
+  (name build_macro)
   (deps
     array_bench.exe
     big_array_bench.exe

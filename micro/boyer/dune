@@ -5,4 +5,4 @@
   (name boyer)
   (libraries harness))
 
-(alias (name buildbench) (deps boyer.exe))
+(alias (name build_micro) (deps boyer.exe))

@@ -5,4 +5,4 @@
  (name ydump)
  (libraries yojson))
 
-(alias (name buildbench) (deps ydump.exe sample.json))
+(alias (name build_macro) (deps ydump.exe sample.json))

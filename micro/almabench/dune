@@ -5,4 +5,4 @@
   (name almabench)
   (libraries harness))
 
-(alias (name buildbench) (deps almabench.exe))
+(alias (name build_micro) (deps almabench.exe))

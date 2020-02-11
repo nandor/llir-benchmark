@@ -5,4 +5,4 @@
   (name format)
   (libraries harness))
 
-(alias (name buildbench) (deps format.exe))
+(alias (name build_micro) (deps format.exe))

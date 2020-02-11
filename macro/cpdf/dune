@@ -2,5 +2,5 @@
 ;; See https://github.com/OCamlPro/ocamlbench-repo
 
 (alias
-  (name buildbench)
+  (name build_macro)
   (deps metro_geo.pdf PDFReference16.pdf_toobig))

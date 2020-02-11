@@ -5,4 +5,4 @@
   (name vector_functor)
   (libraries harness))
 
-(alias (name buildbench) (deps vector_functor.exe))
+(alias (name build_micro) (deps vector_functor.exe))

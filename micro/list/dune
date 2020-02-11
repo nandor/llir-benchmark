@@ -5,4 +5,4 @@
   (name list)
   (libraries harness))
 
-(alias (name buildbench) (deps list.exe))
+(alias (name build_micro) (deps list.exe))

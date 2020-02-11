@@ -1,2 +1,2 @@
 
-(alias (name buildbench) (deps sample.json))
+(alias (name build_macro) (deps sample.json))

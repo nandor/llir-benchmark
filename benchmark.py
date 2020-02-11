@@ -33,15 +33,10 @@ PACKAGES=[
 # List of all switches to evaluate.
 SWITCHES=[
   ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
-  ("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
   ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O0+lto", (['--target', 'genm', '-O0', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O1+lto", (['--target', 'genm', '-O1', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O2+lto", (['--target', 'genm', '-O2', '-lto'], 'genm-gcc', 'genm-ar')),
   ("4.07.1+genm+O3", (['--target', 'genm', '-O3'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O3+lto", (['--target', 'genm', '-O3', '-lto'], 'genm-gcc', 'genm-ar')),
 ]
 
 # opam file to generate for the compiler versions.
@@ -118,6 +113,19 @@ def opam(*args, **kwargs):
   return stdout.decode('utf-8')
 
 
+def dune(jb, target):
+  opam(
+      'exec',
+      '--',
+      'dune',
+      'build',
+      '-j', str(jb),
+      '--profile=release',
+      '--workspace=dune-workspace',
+      target
+  )
+
+
 def run_command(*args, **kwargs):
   """Runs a command."""
 
@@ -192,16 +200,8 @@ def install(jb):
     )
 
   # Build all benchmarks.
-  opam(
-      'exec',
-      '--',
-      'dune',
-      'build',
-      '-j', str(jb),
-      '--profile=release',
-      '--workspace=dune-workspace',
-      '@buildbench'
-  )
+  dune(jb, '@build_macro')
+  dune(jb, '@build_micro')
 
 
 def benchmark_size():
@@ -711,7 +711,7 @@ def _fit(samples):
   return ransac.estimator_.coef_[0][0]
 
 
-def benchmark_micro():
+def benchmark_micro(rand):
   """Runs microbenchmarks."""
 
   perf = defaultdict(dict)
