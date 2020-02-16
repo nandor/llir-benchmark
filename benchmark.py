@@ -17,6 +17,9 @@ from sklearn import linear_model, datasets
 from collections import defaultdict
 from tqdm import tqdm
 
+import macro
+import micro
+
 ROOT=os.path.dirname(os.path.realpath(__file__))
 OPAMROOT=os.path.join(ROOT, '_opam')
 RESULT=os.path.join(ROOT, '_result')
@@ -32,11 +35,11 @@ PACKAGES=[
 
 # List of all switches to evaluate.
 SWITCHES=[
-  ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
-  ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O3", (['--target', 'genm', '-O3'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+static", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
+  #("4.07.1+genm+O0", (['--target', 'genm', '-O0', '-lto'], 'genm-gcc', 'genm-ar')),
+  #("4.07.1+genm+O1", (['--target', 'genm', '-O1', '-lto'], 'genm-gcc', 'genm-ar')),
+  #("4.07.1+genm+O2", (['--target', 'genm', '-O2', '-lto'], 'genm-gcc', 'genm-ar')),
+  #("4.07.1+genm+O3", (['--target', 'genm', '-O3', '-lto'], 'genm-gcc', 'genm-ar')),
 ]
 
 # opam file to generate for the compiler versions.
@@ -143,18 +146,18 @@ def run_command(*args, **kwargs):
       sys.exit(1)
 
 
-def install(jb):
+def install(switches, jb):
   """Installs the switches and the required packages."""
 
   # Set up the workspace file.
   with open(os.path.join(ROOT, 'dune-workspace'), 'w') as f:
     f.write('(lang dune 2.0)\n')
-    for switch, _ in SWITCHES:
+    for switch, _ in switches:
       f.write('(context (opam (switch {0}) (name {0})))\n'.format(switch))
 
   # Set up the opam files for the switches.
   pkg_dir = os.path.join(ROOT, 'dependencies', 'packages', 'ocaml-base-compiler')
-  for switch, (args, _, _) in SWITCHES:
+  for switch, (args, _, _) in switches:
     ver_dir = os.path.join(pkg_dir, 'ocaml-base-compiler.{}'.format(switch))
     if not os.path.exists(ver_dir):
       os.makedirs(ver_dir)
@@ -173,7 +176,7 @@ def install(jb):
   opam('update')
 
   # Install all compilers.
-  for switch, _ in SWITCHES:
+  for switch, _ in switches:
     if switch not in opam('switch', 'list'):
       opam(
           'switch',
@@ -186,7 +189,7 @@ def install(jb):
       )
 
   # Install all packages.
-  for switch, (_, cc, ar) in SWITCHES:
+  for switch, (_, cc, ar) in switches:
     opam(
         'install',
         '--switch={}'.format(switch),
@@ -204,10 +207,10 @@ def install(jb):
   dune(jb, '@build_micro')
 
 
-def benchmark_size():
+def benchmark_size(switches):
   """Finds the code size of all applications in all switches."""
   files = set()
-  for switch, _ in SWITCHES:
+  for switch, _ in switches:
     bin_dir = os.path.join(OPAMROOT, switch, 'bin')
     if os.path.isdir(bin_dir):
       for name in os.listdir(bin_dir):
@@ -223,7 +226,7 @@ def benchmark_size():
 
   sizes = defaultdict(dict)
   for name in files:
-    for switch, _ in SWITCHES:
+    for switch, _ in switches:
       bin_path = os.path.join(OPAMROOT, switch, 'bin', name)
       proc = subprocess.Popen(['size', bin_path], stdout=subprocess.PIPE)
       stdout, _ = proc.communicate()
@@ -250,351 +253,6 @@ class Chdir(object):
 
   def __exit__(self, type, value, traceback):
     os.chdir(self.saved_path)
-
-
-class Macro(object):
-  """Class to describe and run a benchmark."""
-
-  def __init__(self, group, name, exe=None, args=[[]]):
-    """Configures a benchmark."""
-
-    self.group = group
-    self.name = name
-    if exe:
-      self.exe = '_opam/{{0}}/bin/{0}'.format(exe)
-    else:
-      self.exe = '_build/{{0}}/macro/{0}/{1}.exe'.format(group, name)
-    self.args = args
-
-
-ALMABENCH = [
-  Macro(group='almabench', name='almabench', args=[['10']]),
-]
-
-BDD = [
-  Macro(group='bdd', name='bdd', args=[['26']]),
-]
-
-BENCHMARKSGAME = [
-  Macro(group='benchmarksgame', name='binarytrees5', args=[['20']]),
-  Macro(group='benchmarksgame', name='fannkuchredux2', args=[['11']]),
-  Macro(group='benchmarksgame', name='fannkuchredux', args=[['11']]),
-  Macro(group='benchmarksgame', name='fasta3', args=[['10_000_000']]),
-  Macro(group='benchmarksgame', name='fasta6', args=[['10_000_000']]),
-  Macro(group='benchmarksgame', name='knucleotide'),
-  Macro(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
-  Macro(group='benchmarksgame', name='nbody', args=[['100000000']]),
-  Macro(group='benchmarksgame', name='pidigits5', args=[['5000']]),
-  Macro(group='benchmarksgame', name='regexredux2'),
-  Macro(group='benchmarksgame', name='revcomp2'),
-  Macro(group='benchmarksgame', name='spectralnorm2', args=[['2000']]),
-]
-
-CHAMENEOS = [
-  Macro(group='chameneos', name='chameneos_redux_lwt', args=[['600000']]),
-]
-
-KB = [
-  Macro(group='kb', name='kb', args=[[]]),
-  Macro(group='kb', name='kb_no_exc', args=[[]]),
-]
-
-NUMERICAL_ANALYSIS = [
-  Macro(group='numerical-analysis', name='durand_kerner_aberth', args=[
-    ['100']
-  ]),
-  Macro(group='numerical-analysis', name='fft', args=[
-    ['1_048_576']
-  ]),
-  Macro(group='numerical-analysis', name='levinson_durbin', args=[
-    ['10_000']
-  ]),
-  Macro(group='numerical-analysis', name='lu_decomposition', args=[
-    []
-  ]),
-  Macro(group='numerical-analysis', name='naive_multilayer', args=[
-    []
-  ]),
-  Macro(group='numerical-analysis', name='qr_decomposition', args=[
-    []
-  ]),
-]
-
-MENHIR = [
-  Macro(
-      group='menhir',
-      name='menhir',
-      exe='menhir',
-      args=[
-        ['-v', '--table', 'sysver.mly'],
-        ['ocaml.mly', '--list-errors', '-la', '2', '--no-stdlib', '--lalr'],
-        ['-v', '-t', 'keywords.mly', 'sql-parser.mly', '--base', 'sql-parser']
-      ]
-  ),
-]
-
-SIMPLE_TESTS = [
-  Macro(group='simple-tests', name='alloc', args=[
-    ['400_000']
-  ]),
-  Macro(group='simple-tests', name='morestacks', args=[
-    ['1_000']
-  ]),
-  Macro(group='simple-tests', name='stress', args=[
-    ["1", "10", "100_000"],
-    ["10000", "10", "100_000"],
-    ["100000", "10", "100_000"],
-    ["1", "25", "100_000"],
-    ["10000", "25", "100_000"],
-    ["100000", "25", "100_000"],
-    ["1", "50", "100_000"],
-    ["10000", "50", "100_000"],
-    ["100000", "50", "100_000"],
-    ["1", "75", "100_000"],
-    ["10000", "75", "100_000"],
-    ["100000", "75", "100_000"],
-    ["1", "100", "100_000"],
-    ["10000", "100", "100_000"],
-    ["100000", "100", "100_000"],
-  ]),
-  Macro(group='simple-tests', name='capi', args=[
-    ["test_no_args_alloc", "1_000_000_000"],
-    ["test_no_args_noalloc", "1_000_000_000"],
-    ["test_few_args_alloc", "1_000_000_000"],
-    ["test_few_args_noalloc", "1_000_000_000"],
-    ["test_many_args_alloc", "1_000_000_000"],
-    ["test_many_args_noalloc", "1_000_000_000"],
-  ]),
-  Macro(group='simple-tests', name='stacks', args=[
-    ["100000", "ints-small"],
-    ["20000", "ints-large"],
-    ["100000", "floats-small"],
-    ["20000", "floats-large"],
-  ]),
-  Macro(group='simple-tests', name='weakretain', args=[
-    ["25", "1000"],
-    ["25", "100000"],
-    ["25", "10000000"],
-    ["50", "1000"],
-    ["50", "100000"],
-    ["50", "10000000"],
-    ["75", "1000"],
-    ["75", "100000"],
-    ["75", "10000000"],
-    ["100", "1000"],
-    ["100", "100000"],
-    ["100", "10000000"],
-  ]),
-  Macro(group='simple-tests', name='lazylist', args=[
-    ["100000", "200"],
-    ["10000", "10_000"],
-    ["1000", "200_000"],
-  ]),
-  Macro(group='simple-tests', name='lists', args=[
-    ["int", "1"],
-    ["int", "10000"],
-    ["int", "100000"],
-    ["float", "1"],
-    ["float", "10000"],
-    ["float", "100000"],
-    ["int-tuple", "1"],
-    ["int-tuple", "10000"],
-    ["int-tuple", "100000"],
-    ["float-tuple", "1"],
-    ["float-tuple", "10000"],
-    ["float-tuple", "100000"],
-    ["string", "1"],
-    ["string", "10000"],
-    ["string", "100000"],
-    ["record", "1"],
-    ["record", "10000"],
-    ["record", "100000"],
-    ["float-array", "1"],
-    ["float-array", "10000"],
-    ["float-array", "100000"],
-    ["int-array", "1"],
-    ["int-array", "10000"],
-    ["int-array", "100000"],
-    ["int-option-array", "1"],
-    ["int-option-array", "10000"],
-    ["int-option-array", "100000"],
-  ]),
-  Macro(group='simple-tests', name='finalise', args=[
-    ["10"],
-    ["20"],
-    ["30"],
-    ["40"],
-    ["50"],
-    ["60"],
-    ["70"],
-    ["80"],
-    ["90"],
-    ["100"],
-  ]),
-]
-
-STDLIB = [
-  Macro(group='stdlib', name='stack_bench', args=[
-    ["stack_fold", "10_000_000"],
-    ["stack_push_pop", "500_000_000"],
-  ]),
-  Macro(group='stdlib', name='array_bench', args=[
-    ["array_forall", "1000", "1_000_000"],
-    ["array_fold", "1000", "1_000_000"],
-    ["array_iter", "1000", "1_000_000"],
-  ]),
-
-  Macro(group='stdlib', name='bytes_bench', args=[
-    ["bytes_get", "200_000_000"],
-    ["bytes_sub", "200_000_000"],
-    ["bytes_blit", "50_000_000"],
-    ["bytes_concat", "20_000_000"],
-    ["bytes_iter", "10_000_000"],
-    ["bytes_map", "10_000_000"],
-    ["bytes_trim", "20_500_000"],
-    ["bytes_index", "10_000_000"],
-    ["bytes_contains", "100_000_000"],
-    ["bytes_uppercase_ascii", "1_000_000"],
-    ["bytes_set", "1_000_000_000"],
-    ["bytes_cat", "1_000_000_000"],
-  ]),
-  Macro(group='stdlib', name='set_bench', args=[
-    ["set_fold", "1000000"],
-    ["set_add_rem", "20000000"],
-    ["set_mem", "50000000"],
-  ]),
-  Macro(group='stdlib', name='hashtbl_bench', args=[
-    ["int_replace1", "100_000"],
-    ["int_find1", "200_000"],
-    ["caml_hash_int", "200_000"],
-    ["caml_hash_tuple", "100_000"],
-    ["int_replace2", "100_000"],
-    ["int_find2", "500_000"],
-    ["hashtbl_iter", "200_000"],
-    ["hashtbl_fold", "200_000"],
-    ["hashtbl_add_resizing", "4_000_000"],
-    ["hashtbl_add_sized", "6_000_000"],
-    ["hashtbl_add_duplicate", "2_000_000"],
-    ["hashtbl_remove", "40_000_000"],
-    ["hashtbl_find", "60_000_000"],
-    ["hashtbl_filter_map", "100_000"],
-  ]),
-  Macro(group='stdlib', name='string_bench', args=[
-    ["string_get", "50_000_000"],
-    ["string_sub", "50000000"],
-    ["string_blit", "25000000"],
-    ["string_concat", "20000000"],
-    ["string_map", "20000000"],
-    ["string_trim", "100_000_000"],
-    ["string_index", "250_000_000"],
-    ["string_contains", "250_000_000"],
-    ["string_uppercase_ascii", "1000000"],
-    ["string_split_on_char", "500000"],
-    ["string_compare", "100_000"],
-    ["string_equal", "25000"],
-  ]),
-  Macro(group='stdlib', name='str_bench', args=[
-    ["str_regexp", "1000000"],
-    ["str_string_match", "50000000"],
-    ["str_search_forward", "5000000"],
-    ["str_string_partial_match", "250_000_000"],
-    ["str_global_replace", "1000000"],
-    ["str_split", "2000000"],
-  ]),
-  Macro(group='stdlib', name='pervasives_bench', args=[
-    ["pervasives_equal_lists", "1000000000"],
-    ["pervasives_compare_lists", "100000000"],
-    ["pervasives_equal_ints", "1000000000"],
-    ["pervasives_compare_ints", "1000000000"],
-    ["pervasives_equal_floats", "1000000000"],
-    ["pervasives_compare_floats", "200000000"],
-    ["pervasives_equal_strings", "20000000"],
-    ["pervasives_compare_strings", "20000000"],
-  ]),
-  Macro(group='stdlib', name='map_bench', args=[
-    ["map_iter", "50_000"],
-    ["map_add", "1_000_000"],
-    ["map_add_duplicate", "1000000"],
-    ["map_remove", "10_000_000"],
-    ["map_fold", "50_000"],
-    ["map_for_all", "50_000"],
-    ["map_find", "10_000_000"],
-    ["map_map", "10_000"],
-  ]),
-  Macro(group='stdlib', name='big_array_bench', args=[
-    ["big_array_int_rev", "1024", "200_000"],
-    ["big_array_int32_rev", "1024", "200_000"],
-  ])
-]
-
-SEQUENCE = [
-  Macro(group='sequence', name='sequence_cps', args=[['10000']])
-]
-
-YOJSON = [
-  Macro(group='yojson', name='ydump', args=[['-c', 'sample.json']])
-]
-
-ZARITH = [
-  Macro(group='zarith', name='zarith_fact', args=[['40', '4_000_000']]),
-  Macro(group='zarith', name='zarith_fib',  args=[['Z', '40']]),
-  Macro(group='zarith', name='zarith_pi',   args=[['5000']]),
-  Macro(group='zarith', name='zarith_tak',  args=[['Z', '2500']]),
-]
-
-MINILIGHT = [
-  Macro(group='minilight', name='minilight', exe='minilight-ocaml', args=[
-    ['roomfront.ml.txt']
-  ])
-]
-
-JS_OF_OCAML = [
-  Macro(group='js_of_ocaml', name='js_of_ocaml', exe='js_of_ocaml', args=[
-    ['{bin}/ocamlopt.byte', '-o', 'out.js'],
-    ['{bin}/ocamlc.byte', '-o', 'out.js'],
-    ['{bin}/ocamllex.byte', '-o', 'out.js'],
-    ['{bin}/ocamldep.byte', '-o', 'out.js']
-  ])
-]
-
-JSONM = [
-  Macro(group='jsonm', name='jsonm', exe='jsontrip', args=[
-    ['sample.json']
-  ])
-]
-
-CPDF = [
-  Macro(group='cpdf', name='cpdf', exe='cpdf', args=[
-    ['-merge', 'PDFReference16.pdf_toobig', 'metro_geo.pdf', '-o', '/dev/null'],
-    ['scale-to-fit', 'a4landscape', '-twoup', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
-    ['-squeeze', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
-    ['-blacktext', 'metro_geo.pdf', '-o', '/dev/null'],
-  ])
-]
-
-NBCODEC=[
-  Macro(group='nbcodec', name='nbcodec', exe='setrip', args=[
-    ['-enc', '-rseed', '1067894368', '-maxd', '10', '-maxl', '55']
-  ])
-]
-
-MACRO_BENCHMARKS =\
-  ALMABENCH +\
-  BDD +\
-  BENCHMARKSGAME +\
-  CHAMENEOS +\
-  KB +\
-  NUMERICAL_ANALYSIS +\
-  MENHIR +\
-  SIMPLE_TESTS +\
-  STDLIB +\
-  YOJSON +\
-  ZARITH +\
-  MINILIGHT +\
-  JS_OF_OCAML +\
-  JSONM +\
-  CPDF +\
-  NBCODEC
 
 
 def _run_macro_test(test):
@@ -632,11 +290,11 @@ def _run_macro_test(test):
   return bench, switch, args, result
 
 
-def benchmark_macro(n, jt):
+def benchmark_macro(switches, n, jt):
   """Runs performance benchmarks."""
 
   all_tests = []
-  for _, bench, (switch, _) in itertools.product(range(n), MACRO_BENCHMARKS, SWITCHES):
+  for _, bench, (switch, _) in itertools.product(range(n), macro.BENCHMARKS, switches):
     for args in bench.args:
       all_tests.append((bench, switch, args))
   random.shuffle(all_tests)
@@ -660,32 +318,6 @@ def benchmark_macro(n, jt):
   with open(os.path.join(RESULT, 'macro'), 'w') as f:
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
-
-class Micro(object):
-  def __init__(self, name):
-    self.name = name
-    self.exe = '_build/{{0}}/micro/{0}/{0}.exe'.format(name)
-
-
-MICRO_BENCHMARKS=[
-  Micro('almabench'),
-  Micro('bdd'),
-  Micro('bigarray_rev'),
-  Micro('boyer'),
-  Micro('fft'),
-  Micro('fibonacci'),
-  Micro('format'),
-  Micro('hamming'),
-  Micro('kahan_sum'),
-  Micro('kb'),
-  Micro('lens'),
-  Micro('list'),
-  Micro('nucleic'),
-  Micro('num_analysis'),
-  Micro('sequence'),
-  Micro('sieve'),
-  Micro('vector_functor'),
-]
 
 def _run_micro_test(exe):
   """Runs a micro benchmark and captures its output."""
@@ -711,11 +343,11 @@ def _fit(samples):
   return ransac.estimator_.coef_[0][0]
 
 
-def benchmark_micro(rand):
+def benchmark_micro(switches):
   """Runs microbenchmarks."""
 
   perf = defaultdict(dict)
-  all_tests = list(itertools.product(MICRO_BENCHMARKS, SWITCHES))
+  all_tests = list(itertools.product(micro.BENCHMARKS, switches))
   for bench, (switch, _) in tqdm(all_tests):
 
     micro_dir = os.path.join(RESULT, 'log')
@@ -752,9 +384,15 @@ if __name__ == '__main__':
   parser.add_argument('-n', type=int, default=5, action='store')
   parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
+  parser.add_argument('-nr', type=int, default=1, action='store')
   args = parser.parse_args()
 
-  install(args.jb)
-  benchmark_size()
-  benchmark_macro(args.n, args.jt)
-  benchmark_micro()
+  switches = []
+  for name, flags in SWITCHES:
+    for i in range(0, args.nr):
+      switches.append(('{}-{}'.format(name, i), flags))
+
+  install(switches, args.jb)
+  benchmark_size(switches)
+  benchmark_macro(switches, args.n, args.jt)
+  benchmark_micro(switches)
