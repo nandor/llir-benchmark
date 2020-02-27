@@ -12,5 +12,5 @@ synopsis: "Virtual package relying on zlib"
 description:
   "This package can only install if the zlib library is installed on the system."
 url {
-  src: "git+https://github.com/nandor/zlib-genm.git"
+  src: "git+https://github.com/nandor/llir-zlib.git"
 }

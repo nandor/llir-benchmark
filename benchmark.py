@@ -1,4 +1,4 @@
-#!/usr/bin/env -S python3
+#!/usr/bin/env -S python3 -B
 
 import random
 import argparse
@@ -36,25 +36,25 @@ PACKAGES=[
 # List of all switches to evaluate.
 SWITCHES=[
   ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
-  ("4.07.1+genm+O0", (['--target', 'genm', '-O0'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O1", (['--target', 'genm', '-O1'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O2", (['--target', 'genm', '-O2'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O3", (['--target', 'genm', '-O3'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
-  ("4.07.1+genm+O0+lto", (['--target', 'genm', '-O0', '-lto'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O1+lto", (['--target', 'genm', '-O1', '-lto'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O2+lto", (['--target', 'genm', '-O2', '-lto'], 'genm-gcc', 'genm-ar')),
-  ("4.07.1+genm+O3+lto", (['--target', 'genm', '-O3', '-lto'], 'genm-gcc', 'genm-ar')),
+  ("4.07.1+llir+O0", (['--target', 'llir', '-O0'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O1", (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O2", (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O3", (['--target', 'llir', '-O3'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
+  #("4.07.1+llir+O0+lto", (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O1+lto", (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O2+lto", (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar')),
+  #("4.07.1+llir+O3+lto", (['--target', 'llir', '-O3', '-lto'], 'llir-gcc', 'llir-ar')),
 ]
 
 # opam file to generate for the compiler versions.
 OPAM="""opam-version: "2.0"
-version: "4.07.1+genm"
-synopsis: "4.07.1 with the genm backend"
+version: "4.07.1+llir"
+synopsis: "4.07.1 with the LLIR backend"
 maintainer: "n@ndor.email"
 authors: "n@ndor.email"
-homepage: "https://github.com/nandor/ocaml-genm"
-bug-reports: "https://github.com/nandor/ocaml-genm/issues"
+homepage: "https://github.com/nandor/llir-ocaml"
+bug-reports: "https://github.com/nandor/llir-ocaml/issues"
 dev-repo: "git+file://{0}/ocaml#master"
 depends: [
   "ocaml" {{ = "4.07.1" & post }}

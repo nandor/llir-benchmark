@@ -1,5 +1,5 @@
 """
-This file is part of the genm-benchmark project.
+This file is part of the llir-benchmark project.
 (C) 2020 Nandor Licker. All rights reserved.
 """
 

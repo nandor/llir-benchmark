@@ -7,9 +7,9 @@ build: [
   [ make "-j" jobs]
   [ make "PREFIX=%{prefix}%" "install"]
 ]
-synopsis: "Package which install gmp into a switch" 
+synopsis: "Package which install gmp into a switch"
 description: "Provides gmp.h and libgmp.a"
 authors: "nand"
 url {
-  src: "git+https://github.com/nandor/gmp-genm.git"
+  src: "git+https://github.com/nandor/llir-gmp.git"
 }
