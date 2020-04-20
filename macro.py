@@ -328,6 +328,10 @@ NBCODEC=[
   ])
 ]
 
+LLIR=[
+  Macro(group='llir', name='fft', args=['1024'])
+]
+
 BENCHMARKS =\
   ALMABENCH +\
   BDD +\
@@ -344,4 +348,5 @@ BENCHMARKS =\
   JS_OF_OCAML +\
   JSONM +\
   CPDF +\
-  NBCODEC
+  NBCODEC +\
+  LLIR

@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 import statistics
+import resource
 
 from sklearn import linear_model, datasets
 from collections import defaultdict
@@ -30,20 +31,20 @@ PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
   "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
   "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  "jsonm", "cpdf", "nbcodec"
+  "jsonm", "cpdf", "nbcodec", "tyxml"
 ]
 
 # List of all switches to evaluate.
 SWITCHES=[
-  ("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
+  #("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
   ("4.07.1+llir+O0", (['--target', 'llir', '-O0'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O1", (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O2", (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar')),
+  ("4.07.1+llir+O1", (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar')),
+  ("4.07.1+llir+O2", (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar')),
   #("4.07.1+llir+O3", (['--target', 'llir', '-O3'], 'llir-gcc', 'llir-ar')),
   #("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
-  #("4.07.1+llir+O0+lto", (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O1+lto", (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O2+lto", (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar')),
+  ("4.07.1+llir+O0+lto", (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar')),
+  ("4.07.1+llir+O1+lto", (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar')),
+  ("4.07.1+llir+O2+lto", (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar')),
   #("4.07.1+llir+O3+lto", (['--target', 'llir', '-O3', '-lto'], 'llir-gcc', 'llir-ar')),
 ]
 
@@ -392,11 +393,17 @@ if __name__ == '__main__':
   parser.add_argument('-nr', type=int, default=1, action='store')
   args = parser.parse_args()
 
+  # Raise stack limit to 128Mb.
+  stack_size = 128 * 1024 * 1024
+  resource.setrlimit(resource.RLIMIT_STACK, (stack_size, stack_size))
+
+  # Prepare switch names.
   switches = []
   for name, flags in SWITCHES:
     for i in range(0, args.nr):
       switches.append(('{}-{}'.format(name, i), flags))
 
+  # Build and run.
   install(switches, args.jb)
   benchmark_size(switches)
   benchmark_macro(switches, args.n, args.jt)

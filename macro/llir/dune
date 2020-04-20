@@ -1,0 +1,16 @@
+
+(executable
+  (name fft)
+  (modules fft)
+  (libraries complex))
+
+(library
+  (name complex)
+  (modules complex)
+  (foreign_stubs
+    (language c)
+    (names complex_ext)))
+
+(alias
+  (name build_macro)
+  (deps fft.exe))
