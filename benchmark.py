@@ -26,6 +26,10 @@ OPAMROOT=os.path.join(ROOT, '_opam')
 RESULT=os.path.join(ROOT, '_result')
 CPU_COUNT=multiprocessing.cpu_count()
 
+SIZE_PATH = os.path.join(RESULT, 'size')
+MACRO_PATH = os.path.join(RESULT, 'macro')
+MICRO_PATH = os.path.join(RESULT, 'micro')
+
 # List of all packages to install.
 PACKAGES=[
   "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
@@ -34,19 +38,22 @@ PACKAGES=[
   "jsonm", "cpdf", "nbcodec", "tyxml"
 ]
 
+# OCaml version LLIR is built on.
+VERSION='4.07.1'
+
 # List of all switches to evaluate.
-SWITCHES=[
-  #("4.07.1+static", (['-cc', 'musl-clang'], 'musl-clang', 'ar')),
-  ("4.07.1+llir+O0", (['--target', 'llir', '-O0'], 'llir-gcc', 'llir-ar')),
-  ("4.07.1+llir+O1", (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar')),
-  ("4.07.1+llir+O2", (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O3", (['--target', 'llir', '-O3'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+static+lto", (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar')),
-  ("4.07.1+llir+O0+lto", (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar')),
-  ("4.07.1+llir+O1+lto", (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar')),
-  ("4.07.1+llir+O2+lto", (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar')),
-  #("4.07.1+llir+O3+lto", (['--target', 'llir', '-O3', '-lto'], 'llir-gcc', 'llir-ar')),
-]
+SWITCHES={
+  "static": (['-cc', 'musl-clang'], 'musl-clang', 'ar'),
+  "llir+O0": (['--target', 'llir', '-O0'], 'llir-gcc', 'llir-ar'),
+  "llir+O1": (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar'),
+  "llir+O2": (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar'),
+  "llir+O3": (['--target', 'llir', '-O3'], 'llir-gcc', 'llir-ar'),
+  "static+lto": (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar'),
+  "llir+O0+lto": (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O1+lto": (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O2+lto": (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O3+lto": (['--target', 'llir', '-O3', '-lto'], 'llir-gcc', 'llir-ar'),
+}
 
 # opam file to generate for the compiler versions.
 OPAM="""opam-version: "2.0"
@@ -84,7 +91,7 @@ url {{
 """
 
 
-def opam(*args, **kwargs):
+def opam(args, **kwargs):
   """Run the opam process and capture its output."""
 
   env = os.environ.copy()
@@ -123,7 +130,7 @@ def opam(*args, **kwargs):
 
 
 def dune(jb, target):
-  opam(
+  opam([
       'exec',
       '--',
       'dune',
@@ -132,7 +139,7 @@ def dune(jb, target):
       '--profile=release',
       '--workspace=dune-workspace',
       target
-  )
+  ])
 
 
 def run_command(*args, **kwargs):
@@ -171,20 +178,20 @@ def install(switches, jb):
       f.write(OPAM.format(os.getenv('PREFIX'), ' '.join('"{}"'.format(a) for a in args)))
 
   # Set up opam and the custom repository.
-  opam(
+  opam([
       'init',
       '--bare',
       '--no-setup',
       '--no-opamrc',
       '--disable-sandboxing',
       os.path.join(ROOT, 'dependencies')
-  )
-  opam('update')
+  ])
+  opam(['update'])
 
   # Install all compilers.
   for switch, _ in switches:
-    if switch not in opam('switch', 'list'):
-      opam(
+    if switch not in opam(['switch', 'list']):
+      opam([
           'switch',
           'create',
           '--keep-build-dir',
@@ -192,17 +199,19 @@ def install(switches, jb):
           '-j', str(jb),
           switch,
           'ocaml-base-compiler.{}'.format(switch)
-      )
+      ])
 
   # Install all packages.
   for switch, (_, cc, ar) in switches:
     opam(
-        'install',
-        '--switch={}'.format(switch),
-        '--keep-build-dir',
-        '--yes',
-        '-j', str(jb),
-        *PACKAGES,
+        [
+          'install',
+          '--switch={}'.format(switch),
+          '--keep-build-dir',
+          '--yes',
+          '-j', str(jb),
+        ] +
+        PACKAGES,
         cc=cc,
         ar=ar,
         prefix=os.path.join(OPAMROOT, switch)
@@ -215,6 +224,10 @@ def install(switches, jb):
 
 def benchmark_size(switches):
   """Finds the code size of all applications in all switches."""
+
+  if os.path.exists(SIZE_PATH):
+    return
+
   files = set()
   for switch, _ in switches:
     bin_dir = os.path.join(OPAMROOT, switch, 'bin')
@@ -241,9 +254,7 @@ def benchmark_size(switches):
       text, data = [int(t) for t in str(stdout.decode('ascii')).split('\n')[1].split('\t')[:2]]
       sizes[name][switch] = text
 
-  if not os.path.exists(RESULT):
-    os.makedirs(RESULT)
-  with open(os.path.join(RESULT, 'size'), 'w') as f:
+  with open(SIZE_PATH, 'w') as f:
     f.write(json.dumps(sizes, sort_keys=True, indent=2))
 
 
@@ -299,6 +310,9 @@ def _run_macro_test(test):
 def benchmark_macro(switches, n, jt):
   """Runs performance benchmarks."""
 
+  if os.path.exists(MACRO_PATH):
+    return
+
   all_tests = []
   for _, bench, (switch, _) in itertools.product(range(n), macro.BENCHMARKS, switches):
     for args in bench.args:
@@ -319,9 +333,7 @@ def benchmark_macro(switches, n, jt):
   for name, args in failed:
     print('Failed to run {} {}'.format(name, args))
 
-  if not os.path.exists(RESULT):
-    os.makedirs(RESULT)
-  with open(os.path.join(RESULT, 'macro'), 'w') as f:
+  with open(MACRO_PATH, 'w') as f:
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
 
@@ -352,10 +364,12 @@ def _fit(samples):
 def benchmark_micro(switches):
   """Runs microbenchmarks."""
 
+  if os.path.exists(MICRO_PATH):
+    return
+
   perf = defaultdict(dict)
   all_tests = list(itertools.product(micro.BENCHMARKS, switches))
   for bench, (switch, _) in tqdm(all_tests):
-
     micro_dir = os.path.join(RESULT, 'log')
     bench_log = os.path.join(micro_dir, '{}.{}'.format(bench.name, switch))
     if not os.path.exists(micro_dir):
@@ -379,9 +393,7 @@ def benchmark_micro(switches):
       bench_name = '{}.{}'.format(bench.name, test)
       perf[bench_name][switch] = _fit(list(ratios))
 
-  if not os.path.exists(RESULT):
-    os.makedirs(RESULT)
-  with open(os.path.join(RESULT, 'micro'), 'w') as f:
+  with open(MICRO_PATH, 'w') as f:
     f.write(json.dumps(perf, sort_keys=True, indent=2))
 
 
@@ -391,6 +403,11 @@ if __name__ == '__main__':
   parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument('-nr', type=int, default=1, action='store')
+  parser.add_argument(
+      '--switches',
+      type=str,
+      default='static,static+lto,llir+O2,llir+O2+lto'
+  )
   args = parser.parse_args()
 
   # Raise stack limit to 128Mb.
@@ -399,9 +416,13 @@ if __name__ == '__main__':
 
   # Prepare switch names.
   switches = []
-  for name, flags in SWITCHES:
+  for name in args.switches.split(','):
     for i in range(0, args.nr):
-      switches.append(('{}-{}'.format(name, i), flags))
+      switches.append(('{}+{}-{}'.format(VERSION, name, i), SWITCHES[name]))
+
+  # Create output dir, if it does not exist.
+  if not os.path.exists(RESULT):
+    os.makedirs(RESULT)
 
   # Build and run.
   install(switches, args.jb)
