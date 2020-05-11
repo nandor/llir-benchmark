@@ -91,7 +91,7 @@ url {{
 """
 
 
-def opam(args, **kwargs):
+def opam(args, capture=False, **kwargs):
   """Run the opam process and capture its output."""
 
   env = os.environ.copy()
@@ -114,19 +114,25 @@ def opam(args, **kwargs):
       prefix=kwargs['prefix']
     )
 
-  proc = subprocess.Popen(
-      ['opam'] + list(args),
-      stdout=subprocess.PIPE,
-      stderr=subprocess.PIPE,
-      env=env
-  )
-  stdout, stderr = proc.communicate()
-  if proc.returncode != 0:
-      print('"opam {}" failed:\n'.format(' '.join(args)))
-      print(stderr.decode('utf-8'))
-      sys.exit(1)
+  if capture:
+    proc = subprocess.Popen(
+        ['opam'] + list(args),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        env=env
+    )
+    stdout, stderr = proc.communicate()
+    if proc.returncode != 0:
+        print('"opam {}" failed:\n'.format(' '.join(args)))
+        print(stderr.decode('utf-8'))
+        sys.exit(1)
 
-  return stdout.decode('utf-8')
+    return stdout.decode('utf-8')
+  else:
+    proc = subprocess.Popen(['opam'] + list(args),env=env)
+    proc.communicate()
+    if proc.returncode != 0:
+      sys.exit(proc.returncode)
 
 
 def dune(jb, target):
@@ -190,7 +196,7 @@ def install(switches, jb):
 
   # Install all compilers.
   for switch, _ in switches:
-    if switch not in opam(['switch', 'list']):
+    if switch not in opam(['switch', 'list'], capture=True):
       opam([
           'switch',
           'create',
@@ -428,4 +434,4 @@ if __name__ == '__main__':
   install(switches, args.jb)
   benchmark_size(switches)
   benchmark_macro(switches, args.n, args.jt)
-  benchmark_micro(switches)
+  #benchmark_micro(switches)
