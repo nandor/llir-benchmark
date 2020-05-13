@@ -32,10 +32,11 @@ MICRO_PATH = os.path.join(RESULT, 'micro')
 
 # List of all packages to install.
 PACKAGES=[
-  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "rml", "odoc",
-  "ucaml", "ppxfind", "ocamlmod", "camlp4", "menhir", "minilight", "yojson",
-  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  "jsonm", "cpdf", "nbcodec", "tyxml"
+  #"dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "odoc",
+  #"ucaml", "ppxfind", "ocamlmod", "camlp4", "minilight", "yojson",
+  #"lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
+  #"jsonm", "cpdf", "nbcodec", "tyxml",  "menhir", "rml"
+  "coq"
 ]
 
 # OCaml version LLIR is built on.
@@ -43,16 +44,18 @@ VERSION='4.07.1'
 
 # List of all switches to evaluate.
 SWITCHES={
-  "static": (['-cc', 'musl-clang'], 'musl-clang', 'ar'),
-  "llir+O0": (['--target', 'llir', '-O0'], 'llir-gcc', 'llir-ar'),
-  "llir+O1": (['--target', 'llir', '-O1'], 'llir-gcc', 'llir-ar'),
-  "llir+O2": (['--target', 'llir', '-O2'], 'llir-gcc', 'llir-ar'),
-  "llir+O3": (['--target', 'llir', '-O3'], 'llir-gcc', 'llir-ar'),
-  "static+lto": (['-cc', 'musl-clang', '-lto'], 'musl-clang', 'ar'),
-  "llir+O0+lto": (['--target', 'llir', '-O0', '-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O1+lto": (['--target', 'llir', '-O1', '-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O2+lto": (['--target', 'llir', '-O2', '-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O3+lto": (['--target', 'llir', '-O3', '-lto'], 'llir-gcc', 'llir-ar'),
+  "ref": (['-cc', 'musl-clang'], 'musl-clang', 'ar'),
+  "ref+lto": (['-cc', 'musl-clang', '-with-lto'], 'musl-clang', 'ar'),
+
+  "llir+O0": (['-with-llir', 'O0'], 'llir-gcc', 'llir-ar'),
+  "llir+O1": (['-with-llir', 'O1'], 'llir-gcc', 'llir-ar'),
+  "llir+O2": (['-with-llir', 'O2'], 'llir-gcc', 'llir-ar'),
+  "llir+O3": (['-with-llir', 'O3'], 'llir-gcc', 'llir-ar'),
+
+  "llir+O0+lto": (['-with-llir', 'O0', '-with-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O1+lto": (['-with-llir', 'O1', '-with-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O2+lto": (['-with-llir', 'O2', '-with-lto'], 'llir-gcc', 'llir-ar'),
+  "llir+O3+lto": (['-with-llir', 'O3', '-with-lto'], 'llir-gcc', 'llir-ar'),
 }
 
 # opam file to generate for the compiler versions.
@@ -77,8 +80,7 @@ build: [
     "./configure"
       "--prefix" prefix
       "-no-debugger" "-no-instrumented-runtime" "-no-cfi"
-      "-no-debug-runtime" "-no-graph" "-fPIC" "-flambda"
-      "-no-shared-libs"
+      "-no-debug-runtime" "-no-graph" "-flambda"
       {1}
   ]
   [ make "world" "-j%{{jobs}}%"]
@@ -412,7 +414,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--switches',
       type=str,
-      default='static,static+lto,llir+O2,llir+O2+lto'
+      default='ref,ref+lto,llir+O2,llir+O2+lto'
   )
   args = parser.parse_args()
 
@@ -432,6 +434,6 @@ if __name__ == '__main__':
 
   # Build and run.
   install(switches, args.jb)
-  benchmark_size(switches)
-  benchmark_macro(switches, args.n, args.jt)
-  #benchmark_micro(switches)
+  #benchmark_size(switches)
+  #benchmark_macro(switches, args.n, args.jt)
+  #enchmark_micro(switches)
