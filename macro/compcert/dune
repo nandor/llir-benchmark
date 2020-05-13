@@ -1,0 +1,4 @@
+
+(alias
+  (name build_compcert)
+  (deps sqlite3.c))

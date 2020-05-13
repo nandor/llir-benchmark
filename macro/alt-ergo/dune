@@ -1,0 +1,6 @@
+;; Adapted from OCamlPro's ocamlbench-repo
+;; See https://github.com/OCamlPro/ocamlbench-repo
+
+(alias
+  (name build_frama_c)
+  (deps fill.why yyll.why))

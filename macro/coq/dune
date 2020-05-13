@@ -1,0 +1,10 @@
+
+(rule
+  (targets Int.vo)
+  (deps (:src Int.v))
+  (action
+    (run coqc Int.v)))
+
+(alias
+  (name build_compcert)
+  (deps Explode.v Int.vo))

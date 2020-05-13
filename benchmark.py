@@ -35,8 +35,10 @@ PACKAGES=[
   #"dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "odoc",
   #"ucaml", "ppxfind", "ocamlmod", "camlp4", "minilight", "yojson",
   #"lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  #"jsonm", "cpdf", "nbcodec", "tyxml",  "menhir", "rml"
-  "coq"
+  #"jsonm", "cpdf", "nbcodec", "tyxml",  "rml",
+  #"coq", "menhir", "compcert"
+  #"ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip"
+  "frama-c"
 ]
 
 # OCaml version LLIR is built on.
@@ -44,18 +46,11 @@ VERSION='4.07.1'
 
 # List of all switches to evaluate.
 SWITCHES={
-  "ref": (['-cc', 'musl-clang'], 'musl-clang', 'ar'),
-  "ref+lto": (['-cc', 'musl-clang', '-with-lto'], 'musl-clang', 'ar'),
-
-  "llir+O0": (['-with-llir', 'O0'], 'llir-gcc', 'llir-ar'),
-  "llir+O1": (['-with-llir', 'O1'], 'llir-gcc', 'llir-ar'),
-  "llir+O2": (['-with-llir', 'O2'], 'llir-gcc', 'llir-ar'),
-  "llir+O3": (['-with-llir', 'O3'], 'llir-gcc', 'llir-ar'),
-
-  "llir+O0+lto": (['-with-llir', 'O0', '-with-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O1+lto": (['-with-llir', 'O1', '-with-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O2+lto": (['-with-llir', 'O2', '-with-lto'], 'llir-gcc', 'llir-ar'),
-  "llir+O3+lto": (['-with-llir', 'O3', '-with-lto'], 'llir-gcc', 'llir-ar'),
+  "ref": (['-cc', 'musl-clang'], 'musl-clang', 'ar', 'ranlib'),
+  "llir+O0": (['-with-llir', 'O0'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
+  "llir+O1": (['-with-llir', 'O1'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
+  "llir+O2": (['-with-llir', 'O2'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
+  "llir+O3": (['-with-llir', 'O3'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
 }
 
 # opam file to generate for the compiler versions.
@@ -106,6 +101,8 @@ def opam(args, capture=False, **kwargs):
     env['CC'] = kwargs['cc']
   if 'ar' in kwargs:
     env['AR'] = kwargs['ar']
+  if 'ranlib' in kwargs:
+    env['RANLIB'] = kwargs['ranlib']
   if 'prefix' in kwargs:
     env['CFLAGS'] = '{cflags} -I{prefix}/include'.format(
       cflags=env.get('CFLAGS', ''),
@@ -115,6 +112,8 @@ def opam(args, capture=False, **kwargs):
       ldflags=env.get('LDFLAGS', ''),
       prefix=kwargs['prefix']
     )
+    env['ZLIB_INCLUDE'] = os.path.join(kwargs['prefix'], 'include')
+    env['ZLIB_LIBDIR'] = os.path.join(kwargs['prefix'], 'lib')
 
   if capture:
     proc = subprocess.Popen(
@@ -178,7 +177,7 @@ def install(switches, jb):
 
   # Set up the opam files for the switches.
   pkg_dir = os.path.join(ROOT, 'dependencies', 'packages', 'ocaml-base-compiler')
-  for switch, (args, _, _) in switches:
+  for switch, (args, _, _, _) in switches:
     ver_dir = os.path.join(pkg_dir, 'ocaml-base-compiler.{}'.format(switch))
     if not os.path.exists(ver_dir):
       os.makedirs(ver_dir)
@@ -210,7 +209,7 @@ def install(switches, jb):
       ])
 
   # Install all packages.
-  for switch, (_, cc, ar) in switches:
+  for switch, (_, cc, ar, ranlib) in switches:
     opam(
         [
           'install',
@@ -222,12 +221,15 @@ def install(switches, jb):
         PACKAGES,
         cc=cc,
         ar=ar,
+        ranlib=ranlib,
         prefix=os.path.join(OPAMROOT, switch)
     )
 
   # Build all benchmarks.
-  dune(jb, '@build_macro')
-  dune(jb, '@build_micro')
+  #dune(jb, '@build_macro')
+  #dune(jb, '@build_micro')
+  #dune(jb, '@build_compcert')
+  dune(jb, '@build_frama_c')
 
 
 def benchmark_size(switches):
@@ -435,5 +437,5 @@ if __name__ == '__main__':
   # Build and run.
   install(switches, args.jb)
   #benchmark_size(switches)
-  #benchmark_macro(switches, args.n, args.jt)
-  #enchmark_micro(switches)
+  benchmark_macro(switches, args.n, args.jt)
+  #benchmark_micro(switches)

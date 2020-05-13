@@ -16,10 +16,7 @@ depends: [
 ]
 synopsis:
   "Provides easy access to compressed files in ZIP, GZIP and JAR format"
-patches: [
-  "disable-shared-libs.patch"
-]
+patches: "includes.patch"
 url {
-  src: "https://github.com/xavierleroy/camlzip/archive/rel110.zip"
-  checksum: "sha256=a5541cbc38c14467a8abcbdcb54c1d2ed12515c1c4c6da0eb3bdafb44aff7996"
+  src: "git+https://github.com/xavierleroy/camlzip#75917e4c41983b730f4ae21ae841de63132b42a2"
 }

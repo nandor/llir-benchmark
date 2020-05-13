@@ -1,0 +1,55 @@
+diff --git a/META-camlzip b/META-camlzip
+index 3d3db92..b5415b5 100644
+--- a/META-camlzip
++++ b/META-camlzip
+@@ -1 +1,5 @@
+-requires="zip"
+\ No newline at end of file
++version="1.09"
++requires="unix"
++archive(byte)="zip.cma"
++archive(native)="zip.cmxa"
++archive(native,plugin)="zip.cmxs"
+diff --git a/META-zip b/META-zip
+deleted file mode 100644
+index b5415b5..0000000
+--- a/META-zip
++++ /dev/null
+@@ -1,5 +0,0 @@
+-version="1.09"
+-requires="unix"
+-archive(byte)="zip.cma"
+-archive(native)="zip.cmxa"
+-archive(native,plugin)="zip.cmxs"
+diff --git a/Makefile b/Makefile
+index 2545f02..ea33644 100644
+--- a/Makefile
++++ b/Makefile
+@@ -5,12 +5,12 @@ ZLIB_LIB=-lz
+ 
+ # The directory containing the Zlib library (libz.a or libz.so)
+ # Leave empty if libz is in a standard linker directory
+-ZLIB_LIBDIR=
++#ZLIB_LIBDIR=
+ # ZLIB_LIBDIR=/usr/local/lib
+ 
+ # The directory containing the Zlib header file (zlib.h)
+ # Leave empty if zlib.h is in a standard compiler directory
+-ZLIB_INCLUDE=
++#ZLIB_INCLUDE=
+ # ZLIB_INCLUDE=/usr/local/include
+ 
+ ### End of configuration section
+@@ -69,11 +69,8 @@ clean:
+ 
+ install-findlib: install
+ install:
+-	cp META-zip META && \
+-        ocamlfind install zip META *.mli *.a *.cmi *.cma $(wildcard *.cmx) $(wildcard *.cmxa) $(wildcard *.cmxs) $(wildcard *$(EXT_DLL)) && \
+-        rm META
+ 	cp META-camlzip META && \
+-        ocamlfind install camlzip META && \
++        ocamlfind install camlzip META *.mli *.a *.cmi *.cma $(wildcard *.cmx) $(wildcard *.cmxa) $(wildcard *.cmxs) $(wildcard *$(EXT_DLL)) && \
+         rm META
+ 
+ depend:

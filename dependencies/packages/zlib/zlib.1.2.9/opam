@@ -8,6 +8,9 @@ build: [
   ["make" "-j" jobs]
   ["make" "PREFIX=%{prefix}%" "install"]
 ]
+install: [
+  ["make" "install"]
+]
 synopsis: "Virtual package relying on zlib"
 description:
   "This package can only install if the zlib library is installed on the system."

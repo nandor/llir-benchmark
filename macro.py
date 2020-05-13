@@ -332,21 +332,60 @@ LLIR=[
   Macro(group='llir', name='fft', args=['1024'])
 ]
 
-BENCHMARKS =\
-  ALMABENCH +\
-  BDD +\
-  BENCHMARKSGAME +\
-  CHAMENEOS +\
-  KB +\
-  NUMERICAL_ANALYSIS +\
-  MENHIR +\
-  SIMPLE_TESTS +\
-  STDLIB +\
-  YOJSON +\
-  ZARITH +\
-  MINILIGHT +\
-  JS_OF_OCAML +\
-  JSONM +\
-  CPDF +\
-  NBCODEC +\
-  LLIR
+COQ=[
+  Macro(group='coq', name='coq', exe='coqc', args=[
+    ['Explode.v']
+  ]),
+  Macro(group='coq', name='coqchk', exe='coqchk', args=[
+    ['Coq.PArith.BinPos'],
+    ['Int']
+  ])
+]
+
+COMPCERT=[
+  Macro(group='compcert', name='compcert', exe='ccomp', args=[
+    ['sqlite3.c', '-fbitfields', '-fstruct-passing', '-c']
+  ])
+]
+
+ALT_ERGO=[
+  Macro(group='alt-ergo', name='alt-ergo', exe='alt-ergo', args=[
+    ['fill.why'],
+    ['yyll.why']
+  ])
+]
+
+FRAMA_C=[
+  Macro(group='frama-c', name='frama-c', exe='frama-c', args=[
+    [
+      '-slevel', '1000000000',
+      '-no-results',
+      '-no-val-show-progress',
+      't.c',
+      '-val',
+    ]
+  ])
+]
+
+BENCHMARKS=FRAMA_C
+
+#BENCHMARKS =\
+#  ALMABENCH +\
+#  BDD +\
+#  BENCHMARKSGAME +\
+#  CHAMENEOS +\
+#  KB +\
+#  NUMERICAL_ANALYSIS +\
+#  MENHIR +\
+#  SIMPLE_TESTS +\
+#  STDLIB +\
+#  YOJSON +\
+#  ZARITH +\
+#  MINILIGHT +\
+#  JS_OF_OCAML +\
+#  JSONM +\
+#  CPDF +\
+#  NBCODEC +\
+#  LLIR
+
+BENCHMARKS_EXTRA=COQ + COMPCERT + ALT_ERGO + FRAMA_C
