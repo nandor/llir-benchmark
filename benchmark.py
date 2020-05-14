@@ -225,9 +225,9 @@ def install(switches, jb):
     )
 
   # Build all benchmarks.
-  #dune(jb, '@build_macro')
-  #dune(jb, '@build_micro')
-  #dune(jb, '@build_compcert')
+  dune(jb, '@build_macro')
+  dune(jb, '@build_micro')
+  dune(jb, '@build_compcert')
   dune(jb, '@build_frama_c')
 
 
@@ -318,14 +318,14 @@ def _run_macro_test(test):
   return bench, switch, args, result
 
 
-def benchmark_macro(switches, n, jt):
+def benchmark_macro(benchmarks, switches, n, jt):
   """Runs performance benchmarks."""
 
   if os.path.exists(MACRO_PATH):
     return
 
   all_tests = []
-  for _, bench, (switch, _) in itertools.product(range(n), macro.BENCHMARKS, switches):
+  for _, bench, (switch, _) in itertools.product(range(n), benchmarks, switches):
     for args in bench.args:
       all_tests.append((bench, switch, args))
   random.shuffle(all_tests)
@@ -410,14 +410,43 @@ def benchmark_micro(switches):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='GenM OCaml benchmark suite')
-  parser.add_argument('-n', type=int, default=5, action='store')
-  parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
-  parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument(
-      '--switches',
-      type=str,
-      default='ref,ref+lto,llir+O2,llir+O2+lto'
+      '-n',
+      type=int,
+      default=10,
+      action='store',
+      help='number of repetitions for macro tests'
   )
+  parser.add_argument(
+      '-jb',
+      type=int,
+      default=max(1, CPU_COUNT - 1),
+      action='store',
+      help='number of threads to build with'
+  )
+  parser.add_argument(
+      '-jt',
+      type=int,
+      default=1,
+      action='store',
+      help='number of threads to test with'
+  )
+  parser.add_argument(
+      '-switches',
+      type=str,
+      default='ref,llir+O2',
+      help='comma-separated list of switches to run (ref, llir+O0, ...)'
+  )
+  parser.add_argument(
+      '-macro',
+      type=str,
+      action='store',
+      default='TOOLS',
+      choices=[n for n in dir(macro) if not n.startswith('__') and n != 'Macro'],
+      help='benchmark to run'
+  )
+  parser.add_argument('-micro', default=False, action='store_true')
+  parser.add_argument
   args = parser.parse_args()
 
   # Raise stack limit to 128Mb.
@@ -434,7 +463,10 @@ if __name__ == '__main__':
     os.makedirs(RESULT)
 
   # Build and run.
-  #install(switches, args.jb)
+  install(switches, args.jb)
   benchmark_size(switches)
-  #benchmark_macro(switches, args.n, args.jt)
-  #benchmark_micro(switches)
+  benchmark_size(switches)
+  if args.macro:
+    benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
+  if args.micro:
+    benchmark_micro(switches)

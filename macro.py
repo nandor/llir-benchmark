@@ -367,25 +367,31 @@ FRAMA_C=[
   ])
 ]
 
-BENCHMARKS=FRAMA_C
+OCAMLC=[
+  Macro(group='ocamlc', name='ocamlc', exe='ocamlc.opt', args=[
+    [ 'pairs.ml' ],
+    [ 'large.ml' ]
+  ])
+]
 
-#BENCHMARKS =\
-#  ALMABENCH +\
-#  BDD +\
-#  BENCHMARKSGAME +\
-#  CHAMENEOS +\
-#  KB +\
-#  NUMERICAL_ANALYSIS +\
-#  MENHIR +\
-#  SIMPLE_TESTS +\
-#  STDLIB +\
-#  YOJSON +\
-#  ZARITH +\
-#  MINILIGHT +\
-#  JS_OF_OCAML +\
-#  JSONM +\
-#  CPDF +\
-#  NBCODEC +\
-#  LLIR
+MEDIUM =\
+  ALMABENCH +\
+  BDD +\
+  BENCHMARKSGAME +\
+  CHAMENEOS +\
+  KB +\
+  NUMERICAL_ANALYSIS +\
+  MENHIR +\
+  SIMPLE_TESTS +\
+  STDLIB +\
+  YOJSON +\
+  ZARITH +\
+  MINILIGHT +\
+  JSONM +\
+  CPDF +\
+  NBCODEC +\
+  LLIR
 
-BENCHMARKS_EXTRA=COQ + COMPCERT + ALT_ERGO + FRAMA_C
+TOOLS=COQ + COMPCERT + ALT_ERGO + FRAMA_C + OCAMLC + JS_OF_OCAML
+
+ALL=MEDIUM + TOOLS
