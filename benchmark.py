@@ -32,13 +32,12 @@ MICRO_PATH = os.path.join(RESULT, 'micro')
 
 # List of all packages to install.
 PACKAGES=[
-  #"dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "odoc",
-  #"ucaml", "ppxfind", "ocamlmod", "camlp4", "minilight", "yojson",
-  #"lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  #"jsonm", "cpdf", "nbcodec", "tyxml",  "rml",
-  #"coq", "menhir", "compcert"
-  #"ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip"
-  "frama-c"
+  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "odoc",
+  "ucaml", "ppxfind", "ocamlmod", "camlp4", "minilight", "yojson",
+  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
+  "jsonm", "cpdf", "nbcodec", "tyxml",  "rml",
+  "coq", "menhir", "compcert",
+  "ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip", "frama-c"
 ]
 
 # OCaml version LLIR is built on.
@@ -257,12 +256,14 @@ def benchmark_size(switches):
   for name in files:
     for switch, _ in switches:
       bin_path = os.path.join(OPAMROOT, switch, 'bin', name)
-      proc = subprocess.Popen(['size', bin_path], stdout=subprocess.PIPE)
+      proc = subprocess.Popen(['readelf', '-S', bin_path], stdout=subprocess.PIPE)
       stdout, _ = proc.communicate()
       if proc.returncode != 0:
         continue
-      text, data = [int(t) for t in str(stdout.decode('ascii')).split('\n')[1].split('\t')[:2]]
-      sizes[name][switch] = text
+      lines = stdout.decode('ascii').split('\n')[5:-6]
+      for lh, lv in zip(lines, lines[1:]):
+        if '.text' not in lh: continue
+        sizes[name][switch] = int(lv.strip().split(' ')[0], 16)
 
   with open(SIZE_PATH, 'w') as f:
     f.write(json.dumps(sizes, sort_keys=True, indent=2))
@@ -412,7 +413,6 @@ if __name__ == '__main__':
   parser.add_argument('-n', type=int, default=5, action='store')
   parser.add_argument('-jb', type=int, default=CPU_COUNT - 1, action='store')
   parser.add_argument('-jt', type=int, default=CPU_COUNT - 1, action='store')
-  parser.add_argument('-nr', type=int, default=1, action='store')
   parser.add_argument(
       '--switches',
       type=str,
@@ -427,15 +427,14 @@ if __name__ == '__main__':
   # Prepare switch names.
   switches = []
   for name in args.switches.split(','):
-    for i in range(0, args.nr):
-      switches.append(('{}+{}-{}'.format(VERSION, name, i), SWITCHES[name]))
+    switches.append(('{}+{}'.format(VERSION, name), SWITCHES[name]))
 
   # Create output dir, if it does not exist.
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)
 
   # Build and run.
-  install(switches, args.jb)
-  #benchmark_size(switches)
-  benchmark_macro(switches, args.n, args.jt)
+  #install(switches, args.jb)
+  benchmark_size(switches)
+  #benchmark_macro(switches, args.n, args.jt)
   #benchmark_micro(switches)
