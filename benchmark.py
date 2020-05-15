@@ -13,6 +13,7 @@ import subprocess
 import sys
 import statistics
 import resource
+import time
 
 from sklearn import linear_model, datasets
 from collections import defaultdict
@@ -29,6 +30,7 @@ CPU_COUNT=multiprocessing.cpu_count()
 SIZE_PATH = os.path.join(RESULT, 'size')
 MACRO_PATH = os.path.join(RESULT, 'macro')
 MICRO_PATH = os.path.join(RESULT, 'micro')
+BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
 # List of all packages to install.
 PACKAGES=[
@@ -37,7 +39,8 @@ PACKAGES=[
   "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
   "jsonm", "cpdf", "nbcodec", "tyxml",  "rml",
   "coq", "menhir", "compcert",
-  "ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip", "frama-c"
+  "ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip",
+  "base", "stdio", "fix", "uucp", "ocamlformat"
 ]
 
 # OCaml version LLIR is built on.
@@ -87,7 +90,7 @@ url {{
 """
 
 
-def opam(args, capture=False, **kwargs):
+def opam(args, capture=False, silent=False, cwd=None, **kwargs):
   """Run the opam process and capture its output."""
 
   env = os.environ.copy()
@@ -129,11 +132,17 @@ def opam(args, capture=False, **kwargs):
 
     return stdout.decode('utf-8')
   else:
-    proc = subprocess.Popen(['opam'] + list(args),env=env)
-    proc.communicate()
-    if proc.returncode != 0:
+    proc = subprocess.Popen(
+        ['opam'] + list(args),
+        stdout=subprocess.DEVNULL if silent else None,
+        stderr=subprocess.DEVNULL if silent else None,
+        env=env,
+        cwd=cwd
+    )
+    child_pid, status, rusage = os.wait4(proc.pid, 0)
+    if status != 0:
       sys.exit(proc.returncode)
-
+    return rusage.ru_utime
 
 def dune(jb, target):
   opam([
@@ -229,6 +238,88 @@ def install(switches, jb):
   dune(jb, '@build_micro')
   dune(jb, '@build_compcert')
   dune(jb, '@build_frama_c')
+
+
+def benchmark_build_time(switches, n, jb, silent=True):
+  """Measure the build time of packages."""
+
+  times = defaultdict(lambda: defaultdict(list))
+
+  def benchmark_package(name, directory, clean, build):
+    for switch, (conf, cc, ar, ranlib) in switches:
+      project_dir = os.path.join(
+          OPAMROOT,
+          switch,
+          '.opam-switch',
+          'build',
+          directory.format(switch=switch)
+      )
+      print(project_dir)
+
+      def run_helper(args):
+        print(' '.join(args))
+        return opam(
+            [
+              'exec',
+              '--switch={}'.format(switch),
+              '--'
+            ] + args,
+            cc=cc,
+            ar=ar,
+            ranlib=ranlib,
+            prefix=os.path.join(OPAMROOT, switch),
+            cwd=project_dir,
+            silent=silent
+        )
+
+      for i in range(n):
+        run_helper(clean)
+        start = time.time()
+        run_helper(build)
+        end = time.time()
+        dt = end - start
+        print(dt)
+        times[name][switch].append(dt)
+
+  benchmark_package(
+    'ocaml',
+    'ocaml-base-compiler.{switch}',
+    ['make', 'clean'],
+    ['make', 'world.opt', '-j', str(jb)]
+  )
+  benchmark_package(
+    'coq',
+    'coq.8.10.2',
+    ['make', 'clean'],
+    ['make', '-j', str(jb)]
+  )
+  benchmark_package(
+    'alt-ergo-free',
+    'alt-ergo-free.2.0.0',
+    ['make', 'clean'],
+    ['make', '-j', str(jb)]
+  )
+  benchmark_package(
+    'compcert',
+    'compcert.3.6',
+    ['make', 'clean'],
+    ['make', '-j', str(jb)]
+  )
+  benchmark_package(
+    'ocamlformat',
+    'ocamlformat.0.12',
+    ['rm', '-rf', '_build'],
+    ['dune', 'build', '-p', 'ocamlformat', '-j', str(jb)]
+  )
+  benchmark_package(
+    'js_of_ocaml-compiler',
+    'js_of_ocaml-compiler.3.5.1',
+    ['rm', '-rf', '_build'],
+    ['dune', 'build', '-p', 'js_of_ocaml-compiler', '-j', str(jb)]
+  )
+
+  with open(BUILD_TIME_PATH, 'w') as f:
+    f.write(json.dumps(times, sort_keys=True, indent=2))
 
 
 def benchmark_size(switches):
@@ -445,8 +536,8 @@ if __name__ == '__main__':
       choices=[n for n in dir(macro) if not n.startswith('__') and n != 'Macro'],
       help='benchmark to run'
   )
+  parser.add_argument('-time-build', default=False, action='store_true')
   parser.add_argument('-micro', default=False, action='store_true')
-  parser.add_argument
   args = parser.parse_args()
 
   # Raise stack limit to 128Mb.
@@ -464,9 +555,10 @@ if __name__ == '__main__':
 
   # Build and run.
   install(switches, args.jb)
-  benchmark_size(switches)
-  benchmark_size(switches)
+  #benchmark_size(switches)
+  #if args.time_build:
+  #  benchmark_build_time(switches, args.n, args.jb)
   if args.macro:
     benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
-  if args.micro:
-    benchmark_micro(switches)
+  #if args.micro:
+  #  benchmark_micro(switches)

@@ -374,6 +374,13 @@ OCAMLC=[
   ])
 ]
 
+OCAMLFORMAT=[
+  Macro(group='ocamlformat', name='ocamlformat', exe='ocamlformat', args=[
+    [ '--enable-outside-detected-project', 'large.ml' ]
+  ])
+]
+
+
 MEDIUM =\
   ALMABENCH +\
   BDD +\
@@ -392,6 +399,6 @@ MEDIUM =\
   NBCODEC +\
   LLIR
 
-TOOLS=COQ + COMPCERT + ALT_ERGO + FRAMA_C + OCAMLC + JS_OF_OCAML
+TOOLS=COQ + COMPCERT + ALT_ERGO + OCAMLC + JS_OF_OCAML + OCAMLFORMAT
 
 ALL=MEDIUM + TOOLS
