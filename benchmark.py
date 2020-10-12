@@ -47,19 +47,14 @@ SWITCHES={
 # List of all packages to install.
 PACKAGES=[
   "coq", "menhir", "compcert", "ocamlgraph", "cpdf", "minilight", "yojson",
-  "base", "stdio", "dune", "camlzip", "zarith", "ocplib-simplex",
-  "alt-ergo-free",  "ocamlmod", "sexplib0", "odoc", "hevea", "cmitomli",
-  "diy", "angstrom", "hxd",  "alcotest", "bigstringaf", "biniou",
-  "cppo", "csexp", "easy-format", "gmp", "ocaml-syntax-shims", "ounit2",
-  "ppxlib", "re", "zlib", "jsonm", "uuidm", "ocplib-endian", "lwt", "fix",
-  "why3", "tyxml", "nbcodec", "react", "rml", "uucp",
-  "atdgen", "atdj", "atds", "camlp5", "frama-c",
-
-  # "ucaml",
-
-  # "ctypes",
-  # "camlp4",
-  # "ocamlformat", "js_of_ocaml", "ppxfind",
+  "base", "stdio", "dune", "camlzip", "zarith", "ocplib-simplex", "diy",
+  "ocamlmod", "sexplib0", "odoc", "hevea", "cmitomli", "alcotest", "biniou",
+  "bigstringaf", "result", "angstrom", "hxd", "cppo", "csexp", "easy-format",
+  "gmp", "ocaml-syntax-shims", "ounit2", "ppxlib", "re", "zlib", "jsonm",
+  "uuidm", "ocplib-endian", "lwt", "fix", "why3", "tyxml", "nbcodec", "react",
+  "rml", "uucp", "atdgen", "atdj", "atds", "camlp5", "ppxfind", "ucaml",
+  "ocamlformat", "js_of_ocaml", "ppx_deriving", "ppx_tools", "frama-c",
+  "alt-ergo-free",
 ]
 
 # Path to the default repository.
@@ -184,10 +179,10 @@ def install(switches, repository, jb):
     )
 
   ## Build all benchmarks.
-  #dune(jb, '@build_macro')
-  #dune(jb, '@build_micro')
-  #dune(jb, '@build_compcert')
-  #dune(jb, '@build_frama_c')
+  dune(jb, '@build_macro')
+  dune(jb, '@build_micro')
+  dune(jb, '@build_compcert')
+  dune(jb, '@build_frama_c')
 
 
 def benchmark_size(switches):
@@ -197,7 +192,7 @@ def benchmark_size(switches):
     return
 
   files = set()
-  for switch, _ in switches:
+  for switch in switches:
     bin_dir = os.path.join(OPAMROOT, switch, 'bin')
     if os.path.isdir(bin_dir):
       for name in os.listdir(bin_dir):
@@ -213,9 +208,13 @@ def benchmark_size(switches):
 
   sizes = defaultdict(dict)
   for name in files:
-    for switch, _ in switches:
+    for switch in switches:
       bin_path = os.path.join(OPAMROOT, switch, 'bin', name)
-      proc = subprocess.Popen(['readelf', '-S', bin_path], stdout=subprocess.PIPE)
+      proc = subprocess.Popen(
+          ['readelf', '-S', bin_path],
+          stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE
+      )
       stdout, _ = proc.communicate()
       if proc.returncode != 0:
         continue
@@ -284,7 +283,7 @@ def benchmark_macro(benchmarks, switches, n, jt):
     return
 
   all_tests = []
-  for _, bench, (switch, _) in itertools.product(range(n), benchmarks, switches):
+  for _, bench, switch in itertools.product(range(n), benchmarks, switches):
     for args in bench.args:
       all_tests.append((bench, switch, args))
   random.shuffle(all_tests)
@@ -339,7 +338,7 @@ def benchmark_micro(switches):
 
   perf = defaultdict(dict)
   all_tests = list(itertools.product(micro.BENCHMARKS, switches))
-  for bench, (switch, _) in tqdm(all_tests):
+  for bench, switch in tqdm(all_tests):
     micro_dir = os.path.join(RESULT, 'log')
     bench_log = os.path.join(micro_dir, '{}.{}'.format(bench.name, switch))
     if not os.path.exists(micro_dir):
@@ -369,6 +368,13 @@ def benchmark_micro(switches):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='GenM OCaml benchmark suite')
+  parser.add_argument(
+      '-n',
+      type=int,
+      default=1,
+      action='store',
+      help='number of repetitions for macro tests'
+  )
   parser.add_argument(
       '-jb',
       type=int,
@@ -419,8 +425,8 @@ if __name__ == '__main__':
   # Build and run.
   switches = args.switches.split(',')
   install(switches, args.repository, args.jb)
-  #benchmark_size(switches)
-  #if args.macro:
-  #  benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
-  #if args.micro:
-  #  benchmark_micro(switches)
+  benchmark_size(switches)
+  if args.macro:
+    benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
+  if args.micro:
+    benchmark_micro(switches)
