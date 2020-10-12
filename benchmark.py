@@ -32,91 +32,44 @@ MACRO_PATH = os.path.join(RESULT, 'macro')
 MICRO_PATH = os.path.join(RESULT, 'micro')
 BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
-# List of all packages to install.
-PACKAGES=[
-  "dune", "js_of_ocaml", "diy", "hevea", "cmitomli", "hxd", "odoc",
-  "ucaml", "ppxfind", "ocamlmod", "camlp4", "minilight", "yojson",
-  "lwt", "uuidm", "react", "ocplib-endian", "sexplib0", "ctypes", "zarith",
-  "jsonm", "cpdf", "nbcodec", "tyxml",  "rml",
-  "coq", "menhir", "compcert",
-  "ocamlgraph", "ocplib-simplex", "alt-ergo-free", "camlzip",
-  "base", "stdio", "fix", "uucp", "ocamlformat"
-]
-
-# OCaml version LLIR is built on.
-VERSION='4.07.1'
-
-# List of all switches to evaluate.
+# Switches with root packages.
 SWITCHES={
-  "ref": (['-cc', 'musl-clang'], 'musl-clang', 'ar', 'ranlib'),
-  "llir+O0": (['-with-llir', 'O0'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
-  "llir+O1": (['-with-llir', 'O1'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
-  "llir+O2": (['-with-llir', 'O2'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
-  "llir+O3": (['-with-llir', 'O3'], 'llir-gcc', 'llir-ar', 'llir-ranlib'),
+  'ref': ['ocaml-variants.4.11.1.master'],
+  'llir': ['ocaml-variants.4.11.1.master+llir'],
+  'llir+O0': ['llir-config.O0', 'ocaml-variants.4.11.1.master+llir'],
+  'llir+O1': ['llir-config.O1', 'ocaml-variants.4.11.1.master+llir'],
+  'llir+O2': ['llir-config.O2', 'ocaml-variants.4.11.1.master+llir'],
+  'llir+O3': ['llir-config.O3', 'ocaml-variants.4.11.1.master+llir'],
+  'llir+O4': ['llir-config.O4', 'ocaml-variants.4.11.1.master+llir'],
 }
 
-# opam file to generate for the compiler versions.
-OPAM="""opam-version: "2.0"
-version: "4.07.1+llir"
-synopsis: "4.07.1 with the LLIR backend"
-maintainer: "n@ndor.email"
-authors: "n@ndor.email"
-homepage: "https://github.com/nandor/llir-ocaml"
-bug-reports: "https://github.com/nandor/llir-ocaml/issues"
-dev-repo: "git+file://{0}/ocaml#master"
-depends: [
-  "ocaml" {{ = "4.07.1" & post }}
-  "base-unix" {{post}}
-  "base-bigarray" {{post}}
-  "base-threads" {{post}}
-]
-conflict-class: "ocaml-core-compiler"
-flags: compiler
-build: [
-  [
-    "./configure"
-      "--prefix" prefix
-      "-no-debugger" "-no-instrumented-runtime" "-no-cfi"
-      "-no-debug-runtime" "-no-graph" "-flambda"
-      {1}
-  ]
-  [ make "world" "-j%{{jobs}}%"]
-  [ make "world.opt" "-j%{{jobs}}%"]
-]
-install: [make "install"]
-url {{
-  src: "git+file://{0}/ocaml#master"
-}}
-"""
 
+# List of all packages to install.
+PACKAGES=[
+  "coq", "menhir", "compcert", "ocamlgraph", "cpdf", "minilight", "yojson",
+  "base", "stdio", "dune", "camlzip", "zarith", "ocplib-simplex",
+  "alt-ergo-free",  "ocamlmod", "sexplib0", "odoc", "hevea", "cmitomli",
+  "diy", "angstrom", "hxd",  "alcotest", "bigstringaf", "biniou",
+  "cppo", "csexp", "easy-format", "gmp", "ocaml-syntax-shims", "ounit2",
+  "ppxlib", "re", "zlib", "jsonm", "uuidm", "ocplib-endian", "lwt", "fix",
+  "why3", "tyxml", "nbcodec", "react", "rml", "uucp",
+  "atdgen", "atdj", "atds", "camlp5", "frama-c",
+
+  # "ucaml",
+
+  # "ctypes",
+  # "camlp4",
+  # "ocamlformat", "js_of_ocaml", "ppxfind",
+]
+
+# Path to the default repository.
+REPOSITORY='git+https://github.com/nandor/llir-opam-repository'
 
 def opam(args, capture=False, silent=False, cwd=None, **kwargs):
   """Run the opam process and capture its output."""
 
   env = os.environ.copy()
   env['OPAMROOT'] = OPAMROOT
-  env['PATH'] = '{prefix}/dist/bin:{prefix}/dist/musl/bin:{path}'.format(
-      prefix=os.getenv('PREFIX'),
-      path=os.getenv('PATH')
-  )
-  if 'cc' in kwargs:
-    env['CC'] = kwargs['cc']
-  if 'ar' in kwargs:
-    env['AR'] = kwargs['ar']
-  if 'ranlib' in kwargs:
-    env['RANLIB'] = kwargs['ranlib']
-  if 'prefix' in kwargs:
-    env['CFLAGS'] = '{cflags} -I{prefix}/include'.format(
-      cflags=env.get('CFLAGS', ''),
-      prefix=kwargs['prefix']
-    )
-    env['LDFLAGS'] = '{ldflags} -L{prefix}/lib'.format(
-      ldflags=env.get('LDFLAGS', ''),
-      prefix=kwargs['prefix']
-    )
-    env['ZLIB_INCLUDE'] = os.path.join(kwargs['prefix'], 'include')
-    env['ZLIB_LIBDIR'] = os.path.join(kwargs['prefix'], 'lib')
-
   if capture:
     proc = subprocess.Popen(
         ['opam'] + list(args),
@@ -143,6 +96,7 @@ def opam(args, capture=False, silent=False, cwd=None, **kwargs):
     if status != 0:
       sys.exit(proc.returncode)
     return rusage.ru_utime
+
 
 def dune(jb, target):
   opam([
@@ -174,23 +128,14 @@ def run_command(*args, **kwargs):
       sys.exit(1)
 
 
-def install(switches, jb):
+def install(switches, repository, jb):
   """Installs the switches and the required packages."""
 
   # Set up the workspace file.
   with open(os.path.join(ROOT, 'dune-workspace'), 'w') as f:
     f.write('(lang dune 2.0)\n')
-    for switch, _ in switches:
+    for switch in switches:
       f.write('(context (opam (switch {0}) (name {0})))\n'.format(switch))
-
-  # Set up the opam files for the switches.
-  pkg_dir = os.path.join(ROOT, 'dependencies', 'packages', 'ocaml-base-compiler')
-  for switch, (args, _, _, _) in switches:
-    ver_dir = os.path.join(pkg_dir, 'ocaml-base-compiler.{}'.format(switch))
-    if not os.path.exists(ver_dir):
-      os.makedirs(ver_dir)
-    with open(os.path.join(ver_dir, 'opam'), 'w') as f:
-      f.write(OPAM.format(os.getenv('PREFIX'), ' '.join('"{}"'.format(a) for a in args)))
 
   # Set up opam and the custom repository.
   opam([
@@ -199,25 +144,33 @@ def install(switches, jb):
       '--no-setup',
       '--no-opamrc',
       '--disable-sandboxing',
-      os.path.join(ROOT, 'dependencies')
+      repository
   ])
   opam(['update'])
 
-  # Install all compilers.
-  for switch, _ in switches:
+  # Create all the switches.
+  for switch in switches:
     if switch not in opam(['switch', 'list'], capture=True):
       opam([
           'switch',
           'create',
-          '--keep-build-dir',
           '--yes',
           '-j', str(jb),
           switch,
-          'ocaml-base-compiler.{}'.format(switch)
+          '--empty',
       ])
 
+  # Install the compilers.
+  for switch in switches:
+    opam([
+        'install',
+        '--switch={}'.format(switch),
+        '--with-test',
+        '--yes'
+    ] + SWITCHES[switch])
+
   # Install all packages.
-  for switch, (_, cc, ar, ranlib) in switches:
+  for switch in switches:
     opam(
         [
           'install',
@@ -225,101 +178,16 @@ def install(switches, jb):
           '--keep-build-dir',
           '--yes',
           '-j', str(jb),
-        ] +
-        PACKAGES,
-        cc=cc,
-        ar=ar,
-        ranlib=ranlib,
+          '--with-test'
+        ] + PACKAGES,
         prefix=os.path.join(OPAMROOT, switch)
     )
 
-  # Build all benchmarks.
-  dune(jb, '@build_macro')
-  dune(jb, '@build_micro')
-  dune(jb, '@build_compcert')
-  dune(jb, '@build_frama_c')
-
-
-def benchmark_build_time(switches, n, jb, silent=True):
-  """Measure the build time of packages."""
-
-  times = defaultdict(lambda: defaultdict(list))
-
-  def benchmark_package(name, directory, clean, build):
-    for switch, (conf, cc, ar, ranlib) in switches:
-      project_dir = os.path.join(
-          OPAMROOT,
-          switch,
-          '.opam-switch',
-          'build',
-          directory.format(switch=switch)
-      )
-      print(project_dir)
-
-      def run_helper(args):
-        print(' '.join(args))
-        return opam(
-            [
-              'exec',
-              '--switch={}'.format(switch),
-              '--'
-            ] + args,
-            cc=cc,
-            ar=ar,
-            ranlib=ranlib,
-            prefix=os.path.join(OPAMROOT, switch),
-            cwd=project_dir,
-            silent=silent
-        )
-
-      for i in range(n):
-        run_helper(clean)
-        start = time.time()
-        run_helper(build)
-        end = time.time()
-        dt = end - start
-        print(dt)
-        times[name][switch].append(dt)
-
-  benchmark_package(
-    'ocaml',
-    'ocaml-base-compiler.{switch}',
-    ['make', 'clean'],
-    ['make', 'world.opt', '-j', str(jb)]
-  )
-  benchmark_package(
-    'coq',
-    'coq.8.10.2',
-    ['make', 'clean'],
-    ['make', '-j', str(jb)]
-  )
-  benchmark_package(
-    'alt-ergo-free',
-    'alt-ergo-free.2.0.0',
-    ['make', 'clean'],
-    ['make', '-j', str(jb)]
-  )
-  benchmark_package(
-    'compcert',
-    'compcert.3.6',
-    ['make', 'clean'],
-    ['make', '-j', str(jb)]
-  )
-  benchmark_package(
-    'ocamlformat',
-    'ocamlformat.0.12',
-    ['rm', '-rf', '_build'],
-    ['dune', 'build', '-p', 'ocamlformat', '-j', str(jb)]
-  )
-  benchmark_package(
-    'js_of_ocaml-compiler',
-    'js_of_ocaml-compiler.3.5.1',
-    ['rm', '-rf', '_build'],
-    ['dune', 'build', '-p', 'js_of_ocaml-compiler', '-j', str(jb)]
-  )
-
-  with open(BUILD_TIME_PATH, 'w') as f:
-    f.write(json.dumps(times, sort_keys=True, indent=2))
+  ## Build all benchmarks.
+  #dune(jb, '@build_macro')
+  #dune(jb, '@build_micro')
+  #dune(jb, '@build_compcert')
+  #dune(jb, '@build_frama_c')
 
 
 def benchmark_size(switches):
@@ -502,13 +370,6 @@ def benchmark_micro(switches):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='GenM OCaml benchmark suite')
   parser.add_argument(
-      '-n',
-      type=int,
-      default=10,
-      action='store',
-      help='number of repetitions for macro tests'
-  )
-  parser.add_argument(
       '-jb',
       type=int,
       default=max(1, CPU_COUNT - 1),
@@ -523,18 +384,25 @@ if __name__ == '__main__':
       help='number of threads to test with'
   )
   parser.add_argument(
-      '-switches',
-      type=str,
-      default='ref,llir+O2',
-      help='comma-separated list of switches to run (ref, llir+O0, ...)'
-  )
-  parser.add_argument(
       '-macro',
       type=str,
       action='store',
       default='TOOLS',
       choices=[n for n in dir(macro) if not n.startswith('__') and n != 'Macro'],
       help='benchmark to run'
+  )
+  parser.add_argument(
+      '-repository',
+      type=str,
+      action='store',
+      default=REPOSITORY,
+      help='path to the LLIR opam repository'
+  )
+  parser.add_argument(
+      '-switches',
+      type=str,
+      default='ref,llir+O0',
+      help='comma-separated list of switches to run (ref, llir, llir+On)'
   )
   parser.add_argument('-time-build', default=False, action='store_true')
   parser.add_argument('-micro', default=False, action='store_true')
@@ -544,21 +412,15 @@ if __name__ == '__main__':
   stack_size = 128 * 1024 * 1024
   resource.setrlimit(resource.RLIMIT_STACK, (stack_size, stack_size))
 
-  # Prepare switch names.
-  switches = []
-  for name in args.switches.split(','):
-    switches.append(('{}+{}'.format(VERSION, name), SWITCHES[name]))
-
   # Create output dir, if it does not exist.
   if not os.path.exists(RESULT):
     os.makedirs(RESULT)
 
   # Build and run.
-  install(switches, args.jb)
+  switches = args.switches.split(',')
+  install(switches, args.repository, args.jb)
   #benchmark_size(switches)
-  #if args.time_build:
-  #  benchmark_build_time(switches, args.n, args.jb)
-  if args.macro:
-    benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
+  #if args.macro:
+  #  benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
   #if args.micro:
   #  benchmark_micro(switches)
