@@ -251,10 +251,14 @@ def _run_macro_test(test):
     bench, switch, args = test
     exe = os.path.join(ROOT, bench.exe.format(switch))
     bin_dir = os.path.join(ROOT, '_opam', switch, 'bin')
+    lib_dir = os.path.join(ROOT, '_opam', switch, 'lib')
 
     cwd = os.path.join(ROOT, '_build', switch, 'macro', bench.group)
     if not os.path.exists(cwd):
       os.makedirs(cwd)
+
+    env=os.environ.copy()
+    env['LD_LIBRARY_PATH'] = lib_dir
 
     task = subprocess.Popen([
           'taskset',
@@ -264,7 +268,8 @@ def _run_macro_test(test):
         ] + [arg.format(bin=bin_dir) for arg in args],
         cwd=cwd,
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
+        stderr=subprocess.DEVNULL,
+        env=env
     )
     child_pid, status, rusage = os.wait4(task.pid, 0)
 
@@ -278,9 +283,6 @@ def _run_macro_test(test):
 
 def benchmark_macro(benchmarks, switches, n, jt):
   """Runs performance benchmarks."""
-
-  if os.path.exists(MACRO_PATH):
-    return
 
   all_tests = []
   for _, bench, switch in itertools.product(range(n), benchmarks, switches):
@@ -332,9 +334,6 @@ def _fit(samples):
 
 def benchmark_micro(switches):
   """Runs microbenchmarks."""
-
-  if os.path.exists(MICRO_PATH):
-    return
 
   perf = defaultdict(dict)
   all_tests = list(itertools.product(micro.BENCHMARKS, switches))
@@ -424,8 +423,8 @@ if __name__ == '__main__':
 
   # Build and run.
   switches = args.switches.split(',')
-  install(switches, args.repository, args.jb)
-  benchmark_size(switches)
+  #install(switches, args.repository, args.jb)
+  #benchmark_size(switches)
   if args.macro:
     benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
   if args.micro:
