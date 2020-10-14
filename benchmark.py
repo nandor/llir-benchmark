@@ -423,8 +423,8 @@ if __name__ == '__main__':
 
   # Build and run.
   switches = args.switches.split(',')
-  #install(switches, args.repository, args.jb)
-  #benchmark_size(switches)
+  install(switches, args.repository, args.jb)
+  benchmark_size(switches)
   if args.macro:
     benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
   if args.micro:
