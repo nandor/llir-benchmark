@@ -89,13 +89,15 @@ def opam(args, capture=False, silent=False, cwd=None, **kwargs):
     )
     child_pid, status, rusage = os.wait4(proc.pid, 0)
     if status != 0:
+      print('"opam {}" failed:\n'.format(' '.join(args)))
       sys.exit(proc.returncode)
     return rusage.ru_utime
 
 
-def dune(jb, target):
+def dune(jb, switch, target):
   opam([
       'exec',
+      '--switch={}'.format(switch),
       '--',
       'dune',
       'build',
@@ -178,11 +180,12 @@ def install(switches, repository, jb):
         prefix=os.path.join(OPAMROOT, switch)
     )
 
-  ## Build all benchmarks.
-  dune(jb, '@build_macro')
-  dune(jb, '@build_micro')
-  dune(jb, '@build_compcert')
-  dune(jb, '@build_frama_c')
+  # Build all benchmarks.
+  switch = switches[0]
+  dune(jb, switch, '@build_macro')
+  dune(jb, switch, '@build_micro')
+  dune(jb, switch, '@build_compcert')
+  dune(jb, switch, '@build_frama_c')
 
 
 def benchmark_size(switches):
@@ -203,7 +206,7 @@ def benchmark_size(switches):
           continue
         with open(bin_path, 'rb') as f:
           if f.read(4)[1:].decode('ascii') != 'ELF':
-            continue
+            COntinue
         files.add(name)
 
   sizes = defaultdict(dict)
