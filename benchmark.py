@@ -206,7 +206,7 @@ def benchmark_size(switches):
           continue
         with open(bin_path, 'rb') as f:
           if f.read(4)[1:].decode('ascii') != 'ELF':
-            COntinue
+            continue
         files.add(name)
 
   sizes = defaultdict(dict)
@@ -260,9 +260,12 @@ def _run_macro_test(test):
     if not os.path.exists(cwd):
       os.makedirs(cwd)
 
-    env=os.environ.copy()
-    env['LD_LIBRARY_PATH'] = lib_dir
-
+    env={}
+    for line in opam(['env', '--switch', switch], capture=True).split('\n'):
+      if not line.strip(): continue
+      k, v = line.split(';')[0].strip().split('=')
+      env[k] = v[1:-1]
+     
     task = subprocess.Popen([
           'taskset',
           '--cpu-list',
@@ -275,7 +278,7 @@ def _run_macro_test(test):
         env=env
     )
     child_pid, status, rusage = os.wait4(task.pid, 0)
-
+    
     if status == 0:
       result = (rusage.ru_utime, rusage.ru_maxrss)
   except:
