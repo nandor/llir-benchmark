@@ -55,7 +55,8 @@ PACKAGES=[
   "rml", "uucp", "atdgen", "atdj", "atds", "camlp5", "ppxfind", "ucaml",
   "ocamlformat", "js_of_ocaml", "ppx_deriving", "ppx_tools", "frama-c",
   "alt-ergo-free", "camlp4", "num", "fraplib", "cubicle", "uri", "irmin",
-  "stringext",
+  "irmin-mem", "irmin-test", "stringext", "bos", "base64", "digestif", 
+  "eqaf", "crowbar", "metrics-unix"
 ]
 
 # Path to the default repository.

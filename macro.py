@@ -397,9 +397,23 @@ IRMIN=[
   Macro(group='irmin', name='irmin_mem_rw', args=[
     [ '10_000', '50_000', '80', '100_000_000' ],
     [ '10_000', '50_000', '20', '100_000_000' ]
-  ]
+  ])
 ]
 
+THREAD_LWT=[
+  Macro(group='thread-lwt', name='thread_ring_lwt_mvar', args=[
+    [ '20_000' ],
+  ]),
+  Macro(group='thread-lwt', name='thread_ring_lwt_stream', args=[
+    [ '20_000' ],
+  ])
+]
+
+VALET=[
+  Macro(group='valet', name='test_lwt', args=[
+    [ '200' ],
+  ])
+]
 
 MEDIUM =\
   ALMABENCH +\
@@ -421,7 +435,9 @@ MEDIUM =\
   FRAMA_C+\
   CUBICLE+\
   LEXIFY+\
-  IRMIN
+  IRMIN+\
+  THREAD_LWT+\
+  VALET
 
 TOOLS=COQ + COMPCERT + ALT_ERGO + OCAMLC + JS_OF_OCAML + OCAMLFORMAT
 
