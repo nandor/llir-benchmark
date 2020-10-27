@@ -334,7 +334,9 @@ LLIR=[
 
 COQ=[
   Macro(group='coq', name='coq', exe='coqc', args=[
-    ['Explode.v']
+    ['Explode.v'],
+    ['AbstractInterpretation.v'],
+    ['BasicSyntax.v']
   ]),
   Macro(group='coq', name='coqchk', exe='coqchk', args=[
     ['Coq.PArith.BinPos'],
@@ -380,6 +382,14 @@ OCAMLFORMAT=[
   ])
 ]
 
+CUBICLE=[
+  Macro(group='cubicle', name='cubicle', exe='cubicle', args=[
+    [ 'german_pfs.cub' ],
+    [ 'szymanski_at.cub' ]
+  ])
+]
+
+
 
 MEDIUM =\
   ALMABENCH +\
@@ -398,7 +408,8 @@ MEDIUM =\
   CPDF +\
   NBCODEC +\
   LLIR+\
-  FRAMA_C
+  FRAMA_C+\
+  CUBICLE
 
 TOOLS=COQ + COMPCERT + ALT_ERGO + OCAMLC + JS_OF_OCAML + OCAMLFORMAT
 
