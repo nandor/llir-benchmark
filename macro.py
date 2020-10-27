@@ -49,6 +49,10 @@ KB = [
   Macro(group='kb', name='kb_no_exc', args=[[]]),
 ]
 
+LEXIFY = [
+  Macro(group='lexifi-g2pp', name='main', args=[[]])
+]
+
 NUMERICAL_ANALYSIS = [
   Macro(group='numerical-analysis', name='durand_kerner_aberth', args=[
     ['100']
@@ -389,6 +393,12 @@ CUBICLE=[
   ])
 ]
 
+IRMIN=[
+  Macro(group='irmin', name='irmin_mem_rw', args=[
+    [ '10_000', '50_000', '80', '100_000_000' ],
+    [ '10_000', '50_000', '20', '100_000_000' ]
+  ]
+]
 
 
 MEDIUM =\
@@ -409,7 +419,9 @@ MEDIUM =\
   NBCODEC +\
   LLIR+\
   FRAMA_C+\
-  CUBICLE
+  CUBICLE+\
+  LEXIFY+\
+  IRMIN
 
 TOOLS=COQ + COMPCERT + ALT_ERGO + OCAMLC + JS_OF_OCAML + OCAMLFORMAT
 
