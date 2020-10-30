@@ -304,9 +304,11 @@ MINILIGHT = [
 
 JS_OF_OCAML = [
   Macro(group='js_of_ocaml', name='js_of_ocaml', exe='js_of_ocaml', args=[
+    ['{bin}/coqtop.byte', '-o', 'out.js'],
+    ['{bin}/frama-c.byte', '-o', 'out.js'],
     ['{bin}/ocamlopt.byte', '-o', 'out.js'],
-    ['{bin}/ocamlc.byte', '-o', 'out.js'],
     ['{bin}/ocamllex.byte', '-o', 'out.js'],
+    ['{bin}/ocamlprof.byte', '-o', 'out.js'],
     ['{bin}/ocamldep.byte', '-o', 'out.js']
   ])
 ]
