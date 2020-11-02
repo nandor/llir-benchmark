@@ -3,4 +3,7 @@
 
 (alias
   (name build_frama_c)
-  (deps fill.why yyll.why))
+  (deps
+    fill.why
+    yyll.why
+    ggjj.why))

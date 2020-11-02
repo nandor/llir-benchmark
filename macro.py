@@ -34,7 +34,7 @@ BENCHMARKSGAME = [
   Macro(group='benchmarksgame', name='knucleotide'),
   Macro(group='benchmarksgame', name='mandelbrot6', args=[['4000']]),
   Macro(group='benchmarksgame', name='nbody', args=[['100000000']]),
-  Macro(group='benchmarksgame', name='pidigits5', args=[['5000']]),
+  Macro(group='benchmarksgame', name='pidigits5', args=[['7000']]),
   Macro(group='benchmarksgame', name='regexredux2'),
   Macro(group='benchmarksgame', name='revcomp2'),
   Macro(group='benchmarksgame', name='spectralnorm2', args=[['2000']]),
@@ -55,7 +55,7 @@ LEXIFY = [
 
 NUMERICAL_ANALYSIS = [
   Macro(group='numerical-analysis', name='durand_kerner_aberth', args=[
-    ['100']
+    ['100', '50']
   ]),
   Macro(group='numerical-analysis', name='fft', args=[
     ['1_048_576']
@@ -75,21 +75,16 @@ NUMERICAL_ANALYSIS = [
 ]
 
 MENHIR = [
-  Macro(
-      group='menhir',
-      name='menhir',
-      exe='menhir',
-      args=[
-        ['-v', '--table', 'sysver.mly'],
-        ['ocaml.mly', '--list-errors', '-la', '2', '--no-stdlib', '--lalr'],
-        ['-v', '-t', 'keywords.mly', 'sql-parser.mly', '--base', 'sql-parser']
-      ]
-  ),
+  Macro(group='menhir', name='menhir', exe='menhir', args=[
+    ['-v', '--table', 'sysver.mly'],
+    ['ocaml.mly', '--list-errors', '-la', '2', '--no-stdlib', '--lalr'],
+    ['-v', '-t', 'keywords.mly', 'sql-parser.mly', '--base', 'sql-parser']
+  ]),
 ]
 
 SIMPLE_TESTS = [
   Macro(group='simple-tests', name='alloc', args=[
-    ['400_000']
+    ['1_000_000']
   ]),
   Macro(group='simple-tests', name='morestacks', args=[
     ['1_000']
@@ -291,9 +286,9 @@ YOJSON = [
 
 ZARITH = [
   Macro(group='zarith', name='zarith_fact', args=[['40', '4_000_000']]),
-  Macro(group='zarith', name='zarith_fib',  args=[['Z', '40']]),
-  Macro(group='zarith', name='zarith_pi',   args=[['5000']]),
-  Macro(group='zarith', name='zarith_tak',  args=[['Z', '2500']]),
+  Macro(group='zarith', name='zarith_fib',  args=[['Z', '42']]),
+  Macro(group='zarith', name='zarith_pi',   args=[['6000']]),
+  Macro(group='zarith', name='zarith_tak',  args=[['Z', '5000']]),
 ]
 
 MINILIGHT = [
@@ -359,7 +354,8 @@ COMPCERT=[
 ALT_ERGO=[
   Macro(group='alt-ergo', name='alt-ergo', exe='alt-ergo', args=[
     ['fill.why'],
-    ['yyll.why']
+    ['yyll.why'],
+    ['ggjj.why'],
   ])
 ]
 

@@ -172,9 +172,15 @@ let cs =
     if Array.length Sys.argv = 1
     then 100
     else Sys.argv.(1) |> int_of_string in
+
   Array.sub cs 0 (Array.length cs * len / 100)
 
-let main () =
-  roots cs
+let () =
+  let iter =
+    if Array.length Sys.argv < 3
+      then 1
+      else Sys.argv.(2) |> int_of_string in
+  for i = 1 to iter do
+    ignore (roots cs)
+  done
 
-let () = main () |> ignore

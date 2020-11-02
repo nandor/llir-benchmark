@@ -272,7 +272,7 @@ def _run_macro_test(test):
           '--cpu-list',
           str(cpu),
           exe
-        ] + [arg.format(bin=bin_dir) for arg in args],
+        ] + [arg.format(bin=bin_dir, lib=lib_dir) for arg in args],
         cwd=cwd,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
