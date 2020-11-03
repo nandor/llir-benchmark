@@ -3,5 +3,5 @@
 
 CAMLprim value ocaml_read_time_stamp_counter()
 {
-  return Val_long( __rdtsc() );
+  return Val_long( __builtin_readcyclecounter() );
 }
