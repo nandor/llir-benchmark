@@ -33,16 +33,15 @@ MICRO_PATH = os.path.join(RESULT, 'micro')
 BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
 # Switches with root packages.
-SWITCHES={
-  'ref': ['ocaml-variants.4.11.1.master'],
-  'llir': ['ocaml-variants.4.11.1.master+llir'],
-  'llir+O0': ['llir-config.O0', 'ocaml-variants.4.11.1.master+llir'],
-  'llir+O1': ['llir-config.O1', 'ocaml-variants.4.11.1.master+llir'],
-  'llir+O2': ['llir-config.O2', 'ocaml-variants.4.11.1.master+llir'],
-  'llir+O3': ['llir-config.O3', 'ocaml-variants.4.11.1.master+llir'],
-  'llir+O4': ['llir-config.O4', 'ocaml-variants.4.11.1.master+llir'],
-}
-
+SWITCHES = {}
+for arch in ['x86_64', 'arm64', 'ppc64']:
+  SWITCHES[f'{arch}+ref'] = [f'ocaml-variants-{arch}.4.11.1.master']
+  SWITCHES[f'{arch}+llir'] = [f'ocaml-variants-{arch}.4.11.1.master+llir']
+  for opt in ['O0', 'O1', 'O2', 'O3', 'O4']:
+    SWITCHES[f'{arch}+llir+{opt}'] = [
+        f'ocaml-variants-{arch}.4.11.1.master+llir',
+        f'llir-config.{opt}'
+    ]
 
 # List of all packages to install.
 PACKAGES=[
@@ -55,7 +54,7 @@ PACKAGES=[
   "rml", "uucp", "atdgen", "atdj", "atds", "camlp5", "ppxfind", "ucaml",
   "ocamlformat", "js_of_ocaml", "ppx_deriving", "ppx_tools", "frama-c",
   "alt-ergo-free", "camlp4", "num", "fraplib", "cubicle", "uri", "irmin",
-  "irmin-mem", "irmin-test", "stringext", "bos", "base64", "digestif", 
+  "irmin-mem", "irmin-test", "stringext", "bos", "base64", "digestif",
   "eqaf", "crowbar", "metrics-unix"
 ]
 
@@ -266,7 +265,7 @@ def _run_macro_test(test):
       if not line.strip(): continue
       k, v = line.split(';')[0].strip().split('=')
       env[k] = v[1:-1]
-     
+
     task = subprocess.Popen([
           'taskset',
           '--cpu-list',
@@ -279,7 +278,7 @@ def _run_macro_test(test):
         env=env
     )
     child_pid, status, rusage = os.wait4(task.pid, 0)
-    
+
     if status == 0:
       result = (rusage.ru_utime, rusage.ru_maxrss)
   except:
