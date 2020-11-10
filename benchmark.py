@@ -43,6 +43,20 @@ for arch in ['x86_64', 'arm64', 'ppc64']:
         f'llir-config.{opt}'
     ]
 
+# Add CPU-specific switches.
+CPUS = {
+  'x86_64': ['zen2', 'skylake', 'tremont'],
+  'aarch64': ['cortex-a72'],
+  'riscv': ['sifive-u74'],
+  'ppc64': ['pwr9']
+}
+for arch, cpus in CPUS.items():
+  for cpu in cpus:
+    SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
+        f'ocaml-variants-{arch}.4.11.1.master+llir',
+        f'llir-config.{opt}+{cpu}'
+    ]
+
 # List of all packages to install.
 PACKAGES=[
   "coq", "menhir", "compcert", "ocamlgraph", "cpdf", "minilight", "yojson",
