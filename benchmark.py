@@ -412,7 +412,7 @@ if __name__ == '__main__':
       '-macro',
       type=str,
       action='store',
-      default='TOOLS',
+      default=None,
       choices=[n for n in dir(macro) if not n.startswith('__') and n != 'Macro'],
       help='benchmark to run'
   )
