@@ -35,7 +35,7 @@ BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 # Enumeration of supported targets.
 CPUS = {
   'x86_64': ['zen2', 'skylake', 'tremont'],
-  'aarch64': ['cortex-a72'],
+  'arm64': ['cortex-a72'],
   'riscv64': ['sifive-u74'],
   'ppc64': ['pwr9']
 }
