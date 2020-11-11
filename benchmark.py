@@ -32,9 +32,17 @@ MACRO_PATH = os.path.join(RESULT, 'macro')
 MICRO_PATH = os.path.join(RESULT, 'micro')
 BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
+# Enumeration of supported targets.
+CPUS = {
+  'x86_64': ['zen2', 'skylake', 'tremont'],
+  'aarch64': ['cortex-a72'],
+  'riscv64': ['sifive-u74'],
+  'ppc64': ['pwr9']
+}
+
 # Switches with root packages.
 SWITCHES = {}
-for arch in ['x86_64', 'arm64', 'ppc64']:
+for arch, cpus in CPUS.items():
   SWITCHES[f'{arch}+ref'] = [f'ocaml-variants-{arch}.4.11.1.master']
   SWITCHES[f'{arch}+llir'] = [f'ocaml-variants-{arch}.4.11.1.master+llir']
   for opt in ['O0', 'O1', 'O2', 'O3', 'O4']:
@@ -42,15 +50,6 @@ for arch in ['x86_64', 'arm64', 'ppc64']:
         f'ocaml-variants-{arch}.4.11.1.master+llir',
         f'llir-config.{opt}'
     ]
-
-# Add CPU-specific switches.
-CPUS = {
-  'x86_64': ['zen2', 'skylake', 'tremont'],
-  'aarch64': ['cortex-a72'],
-  'riscv': ['sifive-u74'],
-  'ppc64': ['pwr9']
-}
-for arch, cpus in CPUS.items():
   for cpu in cpus:
     SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
         f'ocaml-variants-{arch}.4.11.1.master+llir',
