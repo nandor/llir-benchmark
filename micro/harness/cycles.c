@@ -4,7 +4,7 @@
 CAMLprim value ocaml_read_time_stamp_counter()
 {
 #ifdef __x86_64__
-  return Val_long( __builtin_rdtsc() );
+  return Val_long( __rdtsc() );
 #else
   struct timeval tv;
   gettimeofday(&tv, NULL);
