@@ -365,7 +365,7 @@ FRAMA_C=[
       '-slevel', '1000000000',
       '-no-results',
       '-no-val-show-progress',
-      't.c',
+      't.i',
       '-val',
     ]
   ])

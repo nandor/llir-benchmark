@@ -3,4 +3,4 @@
 
 (alias
   (name build_frama_c)
-  (deps t.c))
+  (deps t.i))
