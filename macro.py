@@ -347,7 +347,7 @@ COQ=[
 
 COMPCERT=[
   Macro(group='compcert', name='compcert', exe='ccomp', args=[
-    ['sqlite3.c', '-fbitfields', '-fstruct-passing', '-c']
+    ['sqlite3.i', '-fbitfields', '-fstruct-passing', '-c', '-S']
   ])
 ]
 
