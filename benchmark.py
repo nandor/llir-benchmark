@@ -68,7 +68,7 @@ PACKAGES=[
   "ocamlformat", "js_of_ocaml", "ppx_deriving", "ppx_tools", "frama-c",
   "alt-ergo-free", "camlp4", "num", "fraplib", "cubicle", "uri", "irmin",
   "irmin-mem", "irmin-test", "stringext", "bos", "base64", "digestif",
-  "eqaf", "crowbar", "metrics-unix"
+  "eqaf", "crowbar", "metrics-unix", "reason"
 ]
 
 # Path to the default repository.
