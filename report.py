@@ -4,8 +4,9 @@ import json
 import textwrap
 import statistics
 import scipy.stats
+import sys
 
-
+arch = sys.argv[1]
 
 with open('_result/macro', 'r') as f:
   data = json.loads(f.read())
@@ -23,9 +24,9 @@ def stdev(ts):
 for bench, runs in data.items():
   def get_times(key): return [t for t, _ in runs[key]]
 
-  keys = sorted(runs.keys() - ['ref'])
+  keys = sorted(runs.keys() - [f'{arch}+ref'])
   times = ''
-  ref_times = get_times('ref')
+  ref_times = get_times(f'{arch}+ref')
   ref_mean = statistics.mean(ref_times)
   times += '{:6.2f}/{:5.3f}'.format(ref_mean, stdev(ref_times))
 
