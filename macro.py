@@ -41,7 +41,7 @@ BENCHMARKSGAME = [
 ]
 
 CHAMENEOS = [
-  Macro(group='chameneos', name='chameneos_redux_lwt', args=[['600000']]),
+  Macro(group='chameneos', name='chameneos_redux_lwt', args=[['2000000']]),
 ]
 
 KB = [
