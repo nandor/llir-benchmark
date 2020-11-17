@@ -45,8 +45,8 @@ CHAMENEOS = [
 ]
 
 KB = [
-  Macro(group='kb', name='kb', args=[[]]),
-  Macro(group='kb', name='kb_no_exc', args=[[]]),
+  Macro(group='kb', name='kb', args=[['200']]),
+  Macro(group='kb', name='kb_no_exc', args=[['200']]),
 ]
 
 LEXIFY = [
