@@ -34,10 +34,10 @@ BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
 # Enumeration of supported targets.
 CPUS = {
-  'x86_64': ['zen2', 'skylake', 'tremont'],
+  'x86_64': ['zen2', 'skylake', 'goldmont_plus'],
   'arm64': ['cortex-a72'],
   'riscv64': ['sifive-u74'],
-  'ppc64': ['pwr9']
+  'ppc64': ['pwr8', 'pwr9']
 }
 
 # Switches with root packages.
@@ -50,11 +50,11 @@ for arch, cpus in CPUS.items():
         f'ocaml-variants-{arch}.4.11.1.master+llir',
         f'llir-config.{opt}'
     ]
-  for cpu in cpus:
-    SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
-        f'ocaml-variants-{arch}.4.11.1.master+llir',
-        f'llir-config.{opt}+{cpu}'
-    ]
+    for cpu in cpus:
+      SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
+          f'ocaml-variants-{arch}.4.11.1.master+llir',
+          f'llir-config.{opt}+{cpu}'
+      ]
 
 # List of all packages to install.
 PACKAGES=[
