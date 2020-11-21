@@ -5,7 +5,6 @@ import argparse
 import contextlib
 import itertools
 import math
-import numpy as np
 import json
 import multiprocessing
 import os
@@ -15,7 +14,6 @@ import statistics
 import resource
 import time
 
-from sklearn import linear_model, datasets
 from collections import defaultdict
 from tqdm import tqdm
 
@@ -343,10 +341,13 @@ def _run_micro_test(exe):
 
 
 def _fit(samples):
-  x = np.array([x for x, _ in samples])
-  y = np.array([y for _, y in samples])
+  import numpy
+  import sklearn
 
-  ransac = linear_model.RANSACRegressor(residual_threshold=10000)
+  x = numpy.array([x for x, _ in samples])
+  y = numpy.array([y for _, y in samples])
+
+  ransac = sklearn.linear_model.RANSACRegressor(residual_threshold=10000)
   ransac.fit(x.reshape(-1, 1), y.reshape(-1, 1))
   return ransac.estimator_.coef_[0][0]
 
