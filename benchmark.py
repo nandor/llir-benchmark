@@ -34,8 +34,8 @@ BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 CPUS = {
   'x86_64': ['zen2', 'skylake', 'tremont'],
   'arm64': ['cortex-a72'],
-  'riscv64': ['sifive-u74'],
-  'ppc64': ['pwr8', 'pwr9']
+  'riscv': ['sifive-u74'],
+  'power': ['pwr8', 'pwr9']
 }
 
 # Switches with root packages.
