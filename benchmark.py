@@ -137,7 +137,7 @@ def run_command(*args, **kwargs):
       sys.exit(1)
 
 
-def install(switches, repository, jb):
+def install(switches, repository, jb, test):
   """Installs the switches and the required packages."""
 
   # Set up the workspace file.
@@ -171,12 +171,12 @@ def install(switches, repository, jb):
 
   # Install the compilers.
   for switch in switches:
+    print('x')
     opam([
         'install',
         '--switch={}'.format(switch),
-        '--with-test',
         '--yes'
-    ] + SWITCHES[switch])
+    ] + (['--with-test'] if test else []) + SWITCHES[switch])
 
   # Install all packages.
   for switch in switches:
@@ -186,8 +186,7 @@ def install(switches, repository, jb):
           '--switch={}'.format(switch),
           '--yes',
           '-j', str(jb),
-          '--with-test'
-        ] + PACKAGES,
+        ] + (['--with-test'] if test else []) + PACKAGES,
         prefix=os.path.join(OPAMROOT, switch)
     )
 
@@ -429,6 +428,12 @@ if __name__ == '__main__':
       default='ref,llir+O0',
       help='comma-separated list of switches to run (ref, llir, llir+On)'
   )
+  parser.add_argument(
+      '-no-test',
+      action='store_false',
+      dest='test',
+      help='Do not run tests'
+  )
   parser.add_argument('-time-build', default=False, action='store_true')
   parser.add_argument('-micro', default=False, action='store_true')
   args = parser.parse_args()
@@ -443,7 +448,7 @@ if __name__ == '__main__':
 
   # Build and run.
   switches = args.switches.split(',')
-  install(switches, args.repository, args.jb)
+  install(switches, args.repository, args.jb, args.test)
   benchmark_size(switches)
   if args.macro:
     benchmark_macro(getattr(macro, args.macro), switches, args.n, args.jt)
