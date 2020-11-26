@@ -10,6 +10,7 @@ import macro
 import micro
 import size
 import run
+import perf
 
 
 
@@ -17,9 +18,10 @@ import run
 ROOT=os.path.dirname(os.path.realpath(__file__))
 OPAMROOT=os.path.join(ROOT, '_opam')
 RESULT=os.path.join(ROOT, '_result')
-SIZE_PATH = os.path.join(RESULT, 'size')
-MACRO_PATH = os.path.join(RESULT, 'macro')
-MICRO_PATH = os.path.join(RESULT, 'micro')
+SIZE_PATH = os.path.join(RESULT, 'size.json')
+MACRO_PATH = os.path.join(RESULT, 'macro.json')
+MICRO_PATH = os.path.join(RESULT, 'micro.json')
+PERF_PATH = os.path.join(RESULT, 'perf')
 BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
 # Path to the default repository.
@@ -97,6 +99,12 @@ if __name__ == '__main__':
       dest='build',
       help='do not build'
   )
+  parser.add_argument(
+      '-perf',
+      action='store_true',
+      dest='perf',
+      help='find hot methods using perf'
+  )
   parser.add_argument('-time-build', default=False, action='store_true')
   args = parser.parse_args()
 
@@ -110,9 +118,12 @@ if __name__ == '__main__':
     build.install(switches, args.repository, args.jb, args.test)
   if args.size:
     size.benchmark_size(switches, OPAMROOT, SIZE_PATH)
-  if args.macro:
+  if args.macro and not args.perf:
     tests = getattr(macro, args.macro)
     run.benchmark_macro(tests, switches, args.n, args.jt, ROOT, MACRO_PATH)
+  if args.macro and args.perf:
+    tests = getattr(macro, args.macro)
+    perf.benchmark_macro(tests, switches, ROOT, PERF_PATH)
   if args.micro:
     tests = getattr(micro, args.micro)
     run.benchmark_micro(tests, switches, MICRO_PATH)

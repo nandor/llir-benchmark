@@ -143,7 +143,7 @@ def benchmark_micro(benchmarks, switches, output):
   perf = defaultdict(dict)
   all_tests = list(itertools.product(benchmarks, switches))
   for bench, switch in tqdm.tqdm(all_tests):
-    micro_dir = os.path.join(output, os.pardir, 'log')
+    micro_dir = os.path.abspath(os.path.join(output, os.pardir, 'log'))
     bench_log = os.path.join(micro_dir, '{}.{}'.format(bench.name, switch))
     if not os.path.exists(micro_dir):
       os.makedirs(micro_dir)
