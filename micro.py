@@ -9,7 +9,7 @@ class Micro(object):
     self.exe = '_build/{{0}}/micro/{0}/{0}.exe'.format(name)
 
 
-BENCHMARKS=[
+ALL=[
   Micro('almabench'),
   Micro('bdd'),
   Micro('bigarray_rev'),
