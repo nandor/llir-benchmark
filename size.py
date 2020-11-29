@@ -9,24 +9,42 @@ import json
 from collections import defaultdict
 
 
+def is_elf_binary(bin_path):
+  """Return true if the binary is valid ELF."""
+  if not os.access(bin_path, os.X_OK):
+    return False
+  if os.path.islink(bin_path):
+    return False
+  with open(bin_path, 'rb') as f:
+    if f.read(4)[1:].decode('ascii') != 'ELF':
+      return False
+  return True
+
+def find_all_binaries(root, switch):
+  """Find all binaries in a switch."""
+
+  files = set()
+
+  bin_dir = os.path.join(root, switch, 'bin')
+  if os.path.isdir(bin_dir):
+    for name in os.listdir(bin_dir):
+      if 'linux' in name or 'llir' in name:
+        continue
+      bin_path = os.path.join(bin_dir, name)
+      if not is_elf_binary(bin_path):
+        continue
+      files.add(name)
+
+  return files
+
+
 
 def benchmark_size(switches, root, output):
   """Finds the code size of all applications in all switches."""
 
   files = set()
   for switch in switches:
-    bin_dir = os.path.join(root, switch, 'bin')
-    if os.path.isdir(bin_dir):
-      for name in os.listdir(bin_dir):
-        bin_path = os.path.join(bin_dir, name)
-        if not os.access(bin_path, os.X_OK):
-          continue
-        if os.path.islink(bin_path):
-          continue
-        with open(bin_path, 'rb') as f:
-          if f.read(4)[1:].decode('ascii') != 'ELF':
-            continue
-        files.add(name)
+    files |= find_all_binaries(root, switch)
 
   sizes = defaultdict(dict)
   for name in files:

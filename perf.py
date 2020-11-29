@@ -44,6 +44,9 @@ def benchmark_macro(benchmarks, switches, root, output):
         "{}.{}".format(bench.name, '_'.join(args).replace('/', '_')
     ))
 
+    if os.path.exists(name):
+      continue
+
     p = subprocess.Popen([
           'perf',
           'record',

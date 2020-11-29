@@ -11,6 +11,7 @@ import micro
 import size
 import run
 import perf
+import disasm
 
 
 
@@ -22,6 +23,7 @@ SIZE_PATH = os.path.join(RESULT, 'size.json')
 MACRO_PATH = os.path.join(RESULT, 'macro.json')
 MICRO_PATH = os.path.join(RESULT, 'micro.json')
 PERF_PATH = os.path.join(RESULT, 'perf')
+DISASM_PATH = os.path.join(RESULT, 'disasm')
 BUILD_TIME_PATH = os.path.join(RESULT, 'build')
 
 # Path to the default repository.
@@ -105,6 +107,12 @@ if __name__ == '__main__':
       dest='perf',
       help='find hot methods using perf'
   )
+  parser.add_argument(
+      '-disasm',
+      action='store_true',
+      dest='disasm',
+      help='disassemble binaries'
+  )
   parser.add_argument('-time-build', default=False, action='store_true')
   args = parser.parse_args()
 
@@ -127,3 +135,5 @@ if __name__ == '__main__':
   if args.micro:
     tests = getattr(micro, args.micro)
     run.benchmark_micro(tests, switches, MICRO_PATH)
+  if args.disasm:
+    disasm.benchmark_insts(switches, ROOT, DISASM_PATH)
