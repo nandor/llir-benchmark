@@ -40,7 +40,8 @@ CORE_PACKAGES=[
   "ppxfind", "ppxlib", "ptime", "randomconv", "re", "react", "reanalyze",
   "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext",
   "tcpip","tuntap", "tyxml", "ucaml", "uri", "uucp", "uuidm", "why3",
-  "xenstore", "yojson", "zarith", "zlib",
+  "xenstore", "yojson", "zarith", "zlib", "irmin-layers", "irmin-pack",
+  "irmin-mem"
 ]
 
 # List of mirage-specific packages.
