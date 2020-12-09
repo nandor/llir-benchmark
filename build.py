@@ -39,7 +39,8 @@ CORE_PACKAGES=[
   "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reanalyze", 
   "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext", 
   "tyxml", "ucaml",  "uri", "uucp",  "uuidm", "why3", "yojson", "zarith", 
-  "zlib", "irmin", "index", "repr"
+  "zlib", "irmin", "index", "repr", "memtrace", "irmin-mem", "irmin-pack",
+  "ppx_deriving_yojson"
 ]
 
 # List of mirage-specific packages.
