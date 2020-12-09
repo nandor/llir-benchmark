@@ -32,16 +32,14 @@ CORE_PACKAGES=[
   "camlzip", "cmitomli", "compcert", "coq", "cpdf", "cppo", "crowbar", "csexp",
   "cstruct", "cstruct-sexp", "cstruct-unix", "cubicle", "digestif", "diy",
   "domain-name", "dune", "duration", "easy-format", "eqaf", "fix", "frama-c",
-  "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin", "irmin-mem",
-  "irmin-test", "js_of_ocaml", "jsonm", "lru", "lwt", "lwt-dllist", "macaddr",
-  "menhir", "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims",
-  "ocamlformat", "ocamlgraph", "ocamlmod", "ocplib-endian", "ocplib-simplex",
-  "odoc", "ounit2", "pcap-format", "ppx_cstruct", "ppx_deriving", "ppx_tools",
-  "ppxfind", "ppxlib", "ptime", "randomconv", "re", "react", "reanalyze",
-  "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext",
-  "tcpip","tuntap", "tyxml", "ucaml", "uri", "uucp", "uuidm", "why3",
-  "xenstore", "yojson", "zarith", "zlib", "irmin-layers", "irmin-pack",
-  "irmin-mem"
+  "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin-test", 
+  "js_of_ocaml", "jsonm", "lru", "lwt", "lwt-dllist", "macaddr", "menhir", 
+  "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims", 
+  "ocamlformat", "ocamlgraph", "ocamlmod", "ocplib-endian", "ocplib-simplex", 
+  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reanalyze", 
+  "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext", 
+  "tyxml", "ucaml",  "uri", "uucp",  "uuidm", "why3", "yojson", "zarith", 
+  "zlib", "irmin", "index", "repr"
 ]
 
 # List of mirage-specific packages.
@@ -64,7 +62,7 @@ MIRAGE_PACKAGES=[
   "opam-depext", "ounit", "parse-argv", "pcap-format", "ppx_cstruct", "ptime", 
   "randomconv", "rresult", "sexplib", "shared-memory-ring", 
   "shared-memory-ring-lwt", "stdlib-shims", "tcpip", "tuntap", "vchan", 
-  "xenstore", "yojson"
+  "xenstore", "yojson", "react"
 ]
 
 # Switches with root packages.
