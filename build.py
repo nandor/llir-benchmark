@@ -32,13 +32,13 @@ CORE_PACKAGES=[
   "camlzip", "cmitomli", "compcert", "coq", "cpdf", "cppo", "crowbar", "csexp",
   "cstruct", "cstruct-sexp", "cstruct-unix", "cubicle", "digestif", "diy",
   "domain-name", "dune", "duration", "easy-format", "eqaf", "fix", "frama-c",
-  "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin-test", 
-  "js_of_ocaml", "jsonm", "lru", "lwt", "lwt-dllist", "macaddr", "menhir", 
-  "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims", 
-  "ocamlformat", "ocamlgraph", "ocamlmod", "ocplib-endian", "ocplib-simplex", 
-  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reanalyze", 
-  "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext", 
-  "tyxml", "ucaml",  "uri", "uucp",  "uuidm", "why3", "yojson", "zarith", 
+  "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin-test",
+  "js_of_ocaml", "jsonm", "lru", "lwt", "lwt-dllist", "macaddr", "menhir",
+  "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims",
+  "ocamlformat", "ocamlgraph", "ocamlmod", "ocplib-endian", "ocplib-simplex",
+  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reanalyze",
+  "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext",
+  "tyxml", "ucaml",  "uri", "uucp",  "uuidm", "why3", "yojson", "zarith",
   "zlib", "irmin", "index", "repr", "memtrace", "irmin-mem", "irmin-pack",
   "ppx_deriving_yojson"
 ]
@@ -56,14 +56,15 @@ MIRAGE_PACKAGES=[
   "mirage", "mirage-block", "mirage-block-unix", "mirage-bootvar-unix",
   "mirage-channel", "mirage-clock", "mirage-clock-unix", "mirage-console",
   "mirage-console-unix", "mirage-crypto", "mirage-device", "mirage-flow",
-  "mirage-fs", "mirage-kv", "mirage-kv-mem", "mirage-logs", "mirage-net", 
-  "mirage-net-unix", "mirage-profile", "mirage-protocols", "mirage-random", 
-  "mirage-random-test", "mirage-runtime", "mirage-stack", "mirage-time", 
-  "mirage-time-unix", "mirage-types", "mirage-types-lwt", "mirage-vnetif", 
-  "opam-depext", "ounit", "parse-argv", "pcap-format", "ppx_cstruct", "ptime", 
-  "randomconv", "rresult", "sexplib", "shared-memory-ring", 
-  "shared-memory-ring-lwt", "stdlib-shims", "tcpip", "tuntap", "vchan", 
-  "xenstore", "yojson", "react"
+  "mirage-fs", "mirage-kv", "mirage-kv-mem", "mirage-logs", "mirage-net",
+  "mirage-net-unix", "mirage-profile", "mirage-protocols", "mirage-random",
+  "mirage-random-test", "mirage-runtime", "mirage-stack", "mirage-time",
+  "mirage-time-unix", "mirage-types", "mirage-types-lwt", "mirage-vnetif",
+  "opam-depext", "ounit", "parse-argv", "pcap-format", "ppx_cstruct", "ptime",
+  "randomconv", "rresult", "sexplib", "shared-memory-ring",
+  "shared-memory-ring-lwt", "stdlib-shims", "tcpip", "tuntap", "vchan",
+  "xenstore", "yojson", "gmp-freestanding", "zarith-freestanding",
+  "mirage-crypto-pk", "cohttp", "cohttp-mirage", "dns"
 ]
 
 # Switches with root packages.
@@ -197,6 +198,7 @@ def install(switches, repository, jb, test):
 
   # Install all packages.
   for switch in switches:
+    opam(['switch', switch])
     opam(
         [
           'install',

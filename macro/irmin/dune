@@ -1,13 +1,13 @@
 (executable
 	(name irmin_mem_rw)
-  (modules irmin_mem_rw)
+	(modules irmin_mem_rw)
 	(libraries irmin irmin-mem lwt.unix))
 
 (executable
 	(name layers)
-  (modules layers)
-  (preprocess
-     (pps ppx_deriving_yojson ppx_repr))
+	(modules layers)
+	(preprocess
+	  (pps ppx_deriving_yojson ppx_repr))
 	(libraries irmin-pack irmin-test.bench irmin-layers lwt unix cmdliner logs
 	   yojson ppx_deriving_yojson memtrace repr ppx_repr))
 
