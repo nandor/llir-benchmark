@@ -23,7 +23,7 @@ CPUS = {
 }
 
 # Enumeration of opt levels.
-OPT = ['O0', 'O1', 'O2', 'O3', 'O4']
+OPT = ['O0', 'O1', 'O2', 'O3', 'O4', 'Os']
 
 # List of all packages to install.
 CORE_PACKAGES=[

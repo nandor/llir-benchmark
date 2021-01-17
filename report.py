@@ -8,7 +8,7 @@ import sys
 
 arch = sys.argv[1]
 
-with open('_result/macro', 'r') as f:
+with open('_result/macro.json', 'r') as f:
   data = json.loads(f.read())
 
 def independent(t0, t1):
