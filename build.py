@@ -16,7 +16,7 @@ OPAMROOT=os.path.join(ROOT, '_opam')
 
 # Enumeration of supported targets.
 CPUS = {
-  'x86_64': ['zen2', 'skylake', 'tremont'],
+  'amd64': ['zen2', 'skylake', 'tremont'],
   'arm64': ['cortex-a72'],
   'riscv': ['sifive-u74'],
   'power': ['pwr8', 'pwr9']
@@ -36,11 +36,10 @@ CORE_PACKAGES=[
   "js_of_ocaml", "jsonm", "lru", "lwt", "lwt-dllist", "macaddr", "menhir",
   "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims",
   "ocamlformat", "ocamlgraph", "ocamlmod", "ocplib-endian", "ocplib-simplex",
-  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reanalyze",
-  "reason", "result", "rml", "sexplib", "sexplib0", "stdio", "stringext",
-  "tyxml", "ucaml",  "uri", "uucp",  "uuidm", "why3", "yojson", "zarith",
-  "zlib", "irmin", "index", "repr", "memtrace", "irmin-mem", "irmin-pack",
-  "ppx_deriving_yojson"
+  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reason", "result",
+  "rml", "sexplib", "sexplib0", "stdio", "stringext", "tyxml", "ucaml",  "uri",
+  "uucp",  "uuidm", "why3", "yojson", "zarith", "zlib", "irmin", "index",
+  "repr", "memtrace", "irmin-pack>=2.4.0", "ppx_deriving_yojson", "ppx_repr"
 ]
 
 # List of mirage-specific packages.
@@ -62,9 +61,16 @@ MIRAGE_PACKAGES=[
   "mirage-time-unix", "mirage-types", "mirage-types-lwt", "mirage-vnetif",
   "opam-depext", "ounit", "parse-argv", "pcap-format", "ppx_cstruct", "ptime",
   "randomconv", "rresult", "sexplib", "shared-memory-ring",
-  "shared-memory-ring-lwt", "stdlib-shims", "tcpip", "tuntap", "vchan",
-  "xenstore", "yojson", "gmp-freestanding", "zarith-freestanding",
-  "mirage-crypto-pk", "cohttp", "cohttp-mirage", "dns"
+  "shared-memory-ring-lwt", "stdlib-shims", "solo5-bindings-hvt", "tcpip",
+  "tuntap", "vchan", "xenstore", "yojson", "gmp-freestanding",
+  "zarith-freestanding", "mirage-crypto-pk", "cohttp", "cohttp-mirage",
+  "dns", "irmin-pack", "irmin-mem", "memtrace", "react", "ppx_repr",
+  "irmin-layers"
+]
+
+# Pinned packages.
+PINNED=[
+  ('zarith', '1.11+llir')
 ]
 
 # Switches with root packages.
@@ -72,36 +78,47 @@ SWITCHES = {}
 PACKAGES = {}
 
 for arch, cpus in CPUS.items():
-  SWITCHES[f'{arch}+ref'] = [f'ocaml-variants-{arch}.4.11.1.master']
+  SWITCHES[f'{arch}+ref'] = [
+    f'ocaml-variants.4.11.1.master',
+    f'arch-{arch}'
+  ]
   PACKAGES[f'{arch}+ref'] = CORE_PACKAGES
-  SWITCHES[f'{arch}+llir'] = [f'ocaml-variants-{arch}.4.11.1.master+llir']
+  SWITCHES[f'{arch}+llir'] = [
+    f'ocaml-variants.4.11.1.master+llir',
+    f'arch-{arch}'
+  ]
   PACKAGES[f'{arch}+llir'] = CORE_PACKAGES
   for opt in OPT:
     SWITCHES[f'{arch}+llir+{opt}'] = [
-        f'ocaml-variants-{arch}.4.11.1.master+llir',
+        f'ocaml-variants.4.11.1.master+llir',
+        f'arch-{arch}',
         f'llir-config.{opt}'
     ]
     PACKAGES[f'{arch}+llir+{opt}'] = CORE_PACKAGES
     for cpu in cpus:
       SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
-          f'ocaml-variants-{arch}.4.11.1.master+llir',
-          f'llir-config.{opt}+{cpu}'
+          f'ocaml-variants.4.11.1.master+llir',
+          f'arch-{arch}',
+          f'llir-config.{opt}'
       ]
 
-for arch in ['x86_64']:
+for arch in ['amd64']:
   SWITCHES[f'{arch}+mirage+ref'] = [
-    f'ocaml-variants-{arch}.4.11.1.master'
+    f'ocaml-variants.4.11.1.master',
+    f'arch-{arch}',
   ]
   PACKAGES[f'{arch}+mirage+ref'] = MIRAGE_PACKAGES
 
   SWITCHES[f'{arch}+mirage+llir'] = [
-    f'ocaml-variants-{arch}.4.11.1.master+llir'
+    f'ocaml-variants.4.11.1.master+llir',
+    f'arch-{arch}',
   ]
   PACKAGES[f'{arch}+mirage+llir'] = MIRAGE_PACKAGES
 
   for opt in OPT:
     SWITCHES[f'{arch}+mirage+llir+{opt}'] = [
-      f'ocaml-variants-{arch}.4.11.1.master+llir',
+      f'ocaml-variants.4.11.1.master+llir',
+      f'arch-{arch}',
       f'llir-config.{opt}'
     ]
     PACKAGES[f'{arch}+mirage+llir+{opt}'] = MIRAGE_PACKAGES
@@ -171,10 +188,8 @@ def install(switches, repository, jb, test):
       '--bare',
       '--no-setup',
       '--no-opamrc',
-      '--disable-sandboxing',
-      repository
+      '--disable-sandboxing'
   ])
-  opam(['update'])
 
   # Create all the switches.
   for switch in switches:
@@ -182,10 +197,23 @@ def install(switches, repository, jb, test):
       opam([
           'switch',
           'create',
-          '--yes',
-          '-j', str(jb),
           switch,
+          '--yes',
           '--empty',
+          '--repos', 'llir={},default'.format(repository)
+      ])
+  opam(['update'])
+
+  # Pin LLIR packages.
+  for switch in switches:
+    for pkg, version in PINNED:
+      opam([
+          'pin',
+          'add',
+          pkg,
+          version,
+          '--switch={}'.format(switch),
+          '--no-action'
       ])
 
   # Install the compilers.
@@ -193,6 +221,7 @@ def install(switches, repository, jb, test):
     opam([
         'install',
         '--switch={}'.format(switch),
+        '-j', str(jb),
         '--yes'
     ] + (['--with-test'] if test else []) + SWITCHES[switch])
 
@@ -203,8 +232,8 @@ def install(switches, repository, jb, test):
         [
           'install',
           '--switch={}'.format(switch),
-          '--yes',
           '-j', str(jb),
+          '--yes',
         ] + (['--with-test'] if test else []) + PACKAGES[switch],
         prefix=os.path.join(OPAMROOT, switch)
     )

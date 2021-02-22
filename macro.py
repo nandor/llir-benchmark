@@ -396,9 +396,9 @@ IRMIN=[
     [ '10_000', '50_000', '80', '100_000_000' ],
     [ '10_000', '50_000', '20', '100_000_000' ]
   ]),
-  Macro(group='irmin', name='layers', args=[
-    [ '-n', '500' ]
-  ])
+  #Macro(group='irmin', name='layers', args=[
+  #  [ '-n', '500' ]
+  #])
 ]
 
 THREAD_LWT=[
