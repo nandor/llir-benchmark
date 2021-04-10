@@ -96,6 +96,19 @@ if __name__ == '__main__':
       help='do not benchmark size'
   )
   parser.add_argument(
+      '-apps',
+      action='store_true',
+      dest='apps',
+      help='install apps',
+      default=True
+  )
+  parser.add_argument(
+      '-no-apps',
+      action='store_false',
+      dest='apps',
+      help='do not install apps'
+  )
+  parser.add_argument(
       '-no-build',
       action='store_false',
       dest='build',
@@ -123,17 +136,17 @@ if __name__ == '__main__':
   # Build and run.
   switches = args.switches.split(',')
   if args.build:
-    build.install(switches, args.repository, args.jb, args.test)
-  if args.size:
+    build.install(switches, args.repository, args.jb, args.test, args.apps)
+  if args.apps and args.size:
     size.benchmark_size(switches, OPAMROOT, SIZE_PATH)
-  if args.macro and not args.perf:
+  if args.apps and (args.macro and not args.perf):
     tests = getattr(macro, args.macro)
     run.benchmark_macro(tests, switches, args.n, args.jt, ROOT, MACRO_PATH)
-  if args.macro and args.perf:
+  if args.apps and (args.macro and args.perf):
     tests = getattr(macro, args.macro)
     perf.benchmark_macro(tests, switches, ROOT, PERF_PATH)
-  if args.micro:
+  if args.apps and args.micro:
     tests = getattr(micro, args.micro)
     run.benchmark_micro(tests, switches, MICRO_PATH)
-  if args.disasm:
+  if args.apps and args.disasm:
     disasm.benchmark_insts(switches, ROOT, DISASM_PATH)

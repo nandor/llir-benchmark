@@ -416,6 +416,18 @@ VALET=[
   ])
 ]
 
+CRYPTO = [
+  Macro(group='crypto', name='ed25519_hacl', args=[['5000']]),
+  Macro(group='crypto', name='ed25519_hacl_external', args=[['5000']]),
+  Macro(group='crypto', name='ed25519_sodium', args=[['5000']]),
+  Macro(group='crypto', name='p256_hacl', args=[['5000']]),
+  Macro(group='crypto', name='p256_hacl_ctypes', args=[['5000']]),
+  Macro(group='crypto', name='p256_hacl_decompress', args=[['5000']]),
+  Macro(group='crypto', name='p256_hacl_external', args=[['5000']]),
+  Macro(group='crypto', name='p256_manual_decompress', args=[['5000']]),
+  Macro(group='crypto', name='p256_uecc', args=[['5000']]),
+]
+
 MEDIUM =\
   ALMABENCH +\
   BDD +\
@@ -442,7 +454,7 @@ MEDIUM =\
 
 TOOLS=COQ + COMPCERT + ALT_ERGO + OCAMLC + JS_OF_OCAML + OCAMLFORMAT
 
-ALL=MEDIUM + TOOLS
+ALL=MEDIUM + TOOLS + CRYPTO
 
 
 LARGE=\

@@ -1,6 +1,6 @@
 (executable
 	(name irmin_mem_rw)
 	(modules irmin_mem_rw)
-	(libraries irmin irmin-mem lwt.unix))
+	(libraries irmin irmin.mem lwt.unix))
 
 (alias (name build_macro) (deps irmin_mem_rw.exe))
