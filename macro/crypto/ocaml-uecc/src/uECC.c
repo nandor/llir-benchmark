@@ -1201,7 +1201,7 @@ static void bits2int(uECC_word_t *native,
     bcopy((uint8_t *) native, bits, bits_size);
 #else
     uECC_vli_bytesToNative(native, bits, bits_size);
-#endif    
+#endif
     if (bits_size * 8 <= (unsigned)curve->num_n_bits) {
         return;
     }
@@ -1290,7 +1290,7 @@ static int uECC_sign_with_k(const uint8_t *private_key,
     bcopy((uint8_t *) signature + curve->num_bytes, (uint8_t *) s, curve->num_bytes);
 #else
     uECC_vli_nativeToBytes(signature + curve->num_bytes, curve->num_bytes, s);
-#endif    
+#endif
     return 1;
 }
 
@@ -1463,7 +1463,7 @@ int uECC_verify(const uint8_t *public_key,
     uECC_word_t *_public = (uECC_word_t *)public_key;
 #else
     uECC_word_t _public[uECC_MAX_WORDS * 2];
-#endif    
+#endif
     uECC_word_t r[uECC_MAX_WORDS], s[uECC_MAX_WORDS];
     wordcount_t num_words = curve->num_words;
     wordcount_t num_n_words = BITS_TO_WORDS(curve->num_n_bits);

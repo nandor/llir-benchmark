@@ -19,15 +19,13 @@
   (foreign_stubs (language c) (names hacl_stubs))
   (c_library_flags (-L%{env:OPAM_SWITCH_PREFIX=}/lib/hacl-star-raw -levercrypt)))
 
-(executable (name ed25519_hacl) (modules ed25519_hacl) (libraries util_ed25519))
-(executable (name ed25519_hacl_external) (modules ed25519_hacl_external) (libraries util_ed25519 stubs))
-(executable (name ed25519_sodium) (modules ed25519_sodium) (libraries util_ed25519 sodium))
-(executable (name p256_hacl) (modules p256_hacl) (libraries util_p256))
-(executable (name p256_hacl_ctypes) (modules p256_hacl_ctypes) (libraries util_p256))
-(executable (name p256_hacl_decompress) (modules p256_hacl_decompress) (libraries util_p256))
-(executable (name p256_hacl_external) (modules p256_hacl_external) (libraries util_p256 stubs))
-(executable (name p256_manual_decompress) (modules p256_manual_decompress) (libraries util_p256))
-(executable (name p256_uecc) (modules p256_uecc) (libraries util_p256 uecc))
+(executable (flags (:standard -ccopt -static)) (name ed25519_hacl) (modules ed25519_hacl) (libraries util_ed25519))
+(executable (flags (:standard -ccopt -static)) (name ed25519_hacl_external) (modules ed25519_hacl_external) (libraries util_ed25519 stubs))
+(executable (flags (:standard -ccopt -static)) (name ed25519_sodium) (modules ed25519_sodium) (libraries util_ed25519 sodium))
+(executable (flags (:standard -ccopt -static)) (name p256_hacl) (modules p256_hacl) (libraries util_p256))
+(executable (flags (:standard -ccopt -static)) (name p256_hacl_ctypes) (modules p256_hacl_ctypes) (libraries util_p256))
+(executable (flags (:standard -ccopt -static)) (name p256_hacl_external) (modules p256_hacl_external) (libraries util_p256 stubs))
+(executable (flags (:standard -ccopt -static)) (name p256_uecc) (modules p256_uecc) (libraries util_p256 uecc))
 
 (alias
   (name build_crypto)
@@ -37,7 +35,5 @@
     ed25519_sodium.exe
     p256_hacl.exe
     p256_hacl_ctypes.exe
-    p256_hacl_decompress.exe
     p256_hacl_external.exe
-    p256_manual_decompress.exe
     p256_uecc.exe))

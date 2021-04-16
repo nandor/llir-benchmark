@@ -4,3 +4,5 @@ _build
 _result
 .merlin
 __pycache__
+*.data
+*.data.old

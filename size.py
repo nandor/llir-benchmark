@@ -13,7 +13,7 @@ def is_elf_binary(bin_path):
   """Return true if the binary is valid ELF."""
   if not os.access(bin_path, os.X_OK):
     return False
-  if os.path.islink(bin_path):
+  if os.path.islink(bin_path) or os.path.isdir(bin_path):
     return False
   with open(bin_path, 'rb') as f:
     if f.read(4)[1:].decode('ascii') != 'ELF':
