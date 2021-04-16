@@ -17,15 +17,20 @@ class Macro(object):
       self.exe = '_build/{{0}}/macro/{0}/{1}.exe'.format(group, name)
     self.args = args
 
-ALMABENCH = [
+class Group(object):
+  def __init__(self, target, tests):
+    self.target = target
+    self.tests = tests
+
+ALMABENCH = [Group('opam:@build_macro', [
   Macro(group='almabench', name='almabench', args=[['10']]),
-]
+])]
 
-BDD = [
+BDD = [Group('opam:@build_macro', [
   Macro(group='bdd', name='bdd', args=[['26']]),
-]
+])]
 
-BENCHMARKSGAME = [
+BENCHMARKSGAME = [Group('opam:@build_macro', [
   Macro(group='benchmarksgame', name='binarytrees5', args=[['20']]),
   Macro(group='benchmarksgame', name='fannkuchredux2', args=[['11']]),
   Macro(group='benchmarksgame', name='fannkuchredux', args=[['11']]),
@@ -38,22 +43,22 @@ BENCHMARKSGAME = [
   Macro(group='benchmarksgame', name='regexredux2'),
   Macro(group='benchmarksgame', name='revcomp2'),
   Macro(group='benchmarksgame', name='spectralnorm2', args=[['2000']]),
-]
+])]
 
-CHAMENEOS = [
+CHAMENEOS = [Group('opam:@build_macro', [
   Macro(group='chameneos', name='chameneos_redux_lwt', args=[['2000000']]),
-]
+])]
 
-KB = [
+KB = [Group('opam:@build_macro', [
   Macro(group='kb', name='kb', args=[['200']]),
   Macro(group='kb', name='kb_no_exc', args=[['200']]),
-]
+])]
 
-LEXIFY = [
+LEXIFY = [Group('opam:@build_macro', [
   Macro(group='lexifi-g2pp', name='main', args=[[]])
-]
+])]
 
-NUMERICAL_ANALYSIS = [
+NUMERICAL_ANALYSIS = [Group('opam:@build_macro', [
   Macro(group='numerical-analysis', name='durand_kerner_aberth', args=[
     ['100', '50']
   ]),
@@ -72,17 +77,17 @@ NUMERICAL_ANALYSIS = [
   Macro(group='numerical-analysis', name='qr_decomposition', args=[
     []
   ]),
-]
+])]
 
-MENHIR = [
+MENHIR = [Group('opam:@build_macro', [
   Macro(group='menhir', name='menhir', exe='menhir', args=[
     ['-v', '--table', 'sysver.mly'],
     ['ocaml.mly', '--list-errors', '-la', '2', '--no-stdlib', '--lalr'],
     ['-v', '-t', 'keywords.mly', 'sql-parser.mly', '--base', 'sql-parser']
   ]),
-]
+])]
 
-SIMPLE_TESTS = [
+SIMPLE_TESTS = [Group('opam:@build_macro', [
   Macro(group='simple-tests', name='alloc', args=[
     ['1_000_000']
   ]),
@@ -180,9 +185,9 @@ SIMPLE_TESTS = [
     ["90"],
     ["100"],
   ]),
-]
+])]
 
-STDLIB = [
+STDLIB = [Group('opam:@build_macro', [
   Macro(group='stdlib', name='stack_bench', args=[
     ["stack_fold", "10_000_000"],
     ["stack_push_pop", "500_000_000"],
@@ -274,30 +279,30 @@ STDLIB = [
     ["big_array_int_rev", "1024", "200_000"],
     ["big_array_int32_rev", "1024", "200_000"],
   ])
-]
+])]
 
-SEQUENCE = [
+SEQUENCE = [Group('opam:@build_macro', [
   Macro(group='sequence', name='sequence_cps', args=[['10000']])
-]
+])]
 
-YOJSON = [
+YOJSON = [Group('opam:@build_macro', [
   Macro(group='yojson', name='ydump', args=[['-c', 'sample.json']])
-]
+])]
 
-ZARITH = [
+ZARITH = [Group('opam:@build_macro', [
   Macro(group='zarith', name='zarith_fact', args=[['40', '4_000_000']]),
   Macro(group='zarith', name='zarith_fib',  args=[['Z', '42']]),
   Macro(group='zarith', name='zarith_pi',   args=[['6000']]),
   Macro(group='zarith', name='zarith_tak',  args=[['Z', '5000']]),
-]
+])]
 
-MINILIGHT = [
+MINILIGHT = [Group('opam:@build_macro', [
   Macro(group='minilight', name='minilight', exe='minilight-ocaml', args=[
     ['roomfront.ml.txt']
   ])
-]
+])]
 
-JS_OF_OCAML = [
+JS_OF_OCAML = [Group('opam:@build_macro', [
   Macro(group='js_of_ocaml', name='js_of_ocaml', exe='js_of_ocaml', args=[
     ['{bin}/coqtop.byte', '-o', 'out.js'],
     ['{bin}/frama-c.byte', '-o', 'out.js'],
@@ -306,34 +311,34 @@ JS_OF_OCAML = [
     ['{bin}/ocamlprof.byte', '-o', 'out.js'],
     ['{bin}/ocamldep.byte', '-o', 'out.js']
   ])
-]
+])]
 
-JSONM = [
+JSONM = [Group('opam:@build_macro', [
   Macro(group='jsonm', name='jsonm', exe='jsontrip', args=[
     ['sample.json']
   ])
-]
+])]
 
-CPDF = [
+CPDF = [Group('opam:@build_macro', [
   Macro(group='cpdf', name='cpdf', exe='cpdf', args=[
     ['-merge', 'PDFReference16.pdf_toobig', 'metro_geo.pdf', '-o', '/dev/null'],
     ['scale-to-fit', 'a4landscape', '-twoup', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
     ['-squeeze', 'PDFReference16.pdf_toobig', '-o', '/dev/null'],
     ['-blacktext', 'metro_geo.pdf', '-o', '/dev/null'],
   ])
-]
+])]
 
-NBCODEC=[
+NBCODEC = [Group('opam:@build_macro', [
   Macro(group='nbcodec', name='nbcodec', exe='setrip', args=[
     ['-enc', '-rseed', '1067894368', '-maxd', '10', '-maxl', '55']
   ])
-]
+])]
 
-LLIR=[
+LLIR = [Group('opam:@build_macro', [
   Macro(group='llir', name='fft', args=['1024'])
-]
+])]
 
-COQ=[
+COQ = [Group('opam:@build_macro', [
   Macro(group='coq', name='coq', exe='coqc', args=[
     ['Explode.v'],
     ['AbstractInterpretation.v'],
@@ -343,23 +348,23 @@ COQ=[
     ['Coq.PArith.BinPos'],
     ['Int']
   ])
-]
+])]
 
-COMPCERT=[
+COMPCERT = [Group('opam:@build_macro', [
   Macro(group='compcert', name='compcert', exe='ccomp', args=[
     ['sqlite3.i', '-fbitfields', '-fstruct-passing', '-c', '-S']
   ])
-]
+])]
 
-ALT_ERGO=[
+ALT_ERGO = [Group('opam:@build_macro', [
   Macro(group='alt-ergo', name='alt-ergo', exe='alt-ergo', args=[
     ['fill.why'],
     ['yyll.why'],
     ['ggjj.why'],
   ])
-]
+])]
 
-FRAMA_C=[
+FRAMA_C = [Group('opam:@build_frama_c', [
   Macro(group='frama-c', name='frama-c', exe='frama-c', args=[
     [
       '-slevel', '1000000000',
@@ -369,29 +374,29 @@ FRAMA_C=[
       '-val',
     ]
   ])
-]
+])]
 
-OCAMLC=[
+OCAMLC = [Group('opam:@build_macro', [
   Macro(group='ocamlc', name='ocamlc', exe='ocamlc.opt', args=[
     [ 'pairs.ml' ],
     [ 'large.ml' ]
   ])
-]
+])]
 
-OCAMLFORMAT=[
+OCAMLFORMAT = [Group('opam:@build_macro', [
   Macro(group='ocamlformat', name='ocamlformat', exe='ocamlformat', args=[
     [ '--enable-outside-detected-project', 'large.ml' ]
   ])
-]
+])]
 
-CUBICLE=[
+CUBICLE = [Group('opam:@build_macro', [
   Macro(group='cubicle', name='cubicle', exe='cubicle', args=[
     [ 'german_pfs.cub' ],
     [ 'szymanski_at.cub' ]
   ])
-]
+])]
 
-IRMIN=[
+IRMIN = [Group('opam:@build_macro', [
   Macro(group='irmin', name='irmin_mem_rw', args=[
     [ '10_000', '50_000', '80', '100_000_000' ],
     [ '10_000', '50_000', '20', '100_000_000' ]
@@ -399,24 +404,24 @@ IRMIN=[
   #Macro(group='irmin', name='layers', args=[
   #  [ '-n', '500' ]
   #])
-]
+])]
 
-THREAD_LWT=[
+THREAD_LWT = [Group('opam:@build_macro', [
   Macro(group='thread-lwt', name='thread_ring_lwt_mvar', args=[
     [ '20_000' ],
   ]),
   Macro(group='thread-lwt', name='thread_ring_lwt_stream', args=[
     [ '20_000' ],
   ])
-]
+])]
 
-VALET=[
+VALET = [Group('opam:@build_macro', [
   Macro(group='valet', name='test_lwt', args=[
     [ '200' ],
   ])
-]
+])]
 
-CRYPTO = [
+CRYPTO = [Group('opam:@build_crypto', [
   Macro(group='crypto', name='ed25519_hacl', args=[['4000']]),
   Macro(group='crypto', name='ed25519_hacl_external', args=[['4000']]),
   Macro(group='crypto', name='ed25519_sodium', args=[['20000']]),
@@ -424,7 +429,11 @@ CRYPTO = [
   Macro(group='crypto', name='p256_hacl_ctypes', args=[['500']]),
   Macro(group='crypto', name='p256_hacl_external', args=[['500']]),
   Macro(group='crypto', name='p256_uecc', args=[['4000']]),
-]
+])]
+
+VEC = [Group('opam:@build_vec', [
+  Macro(group='vec', name='integer_dot', args=[['10_000_000']])
+])]
 
 MEDIUM =\
   ALMABENCH +\

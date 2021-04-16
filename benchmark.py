@@ -134,19 +134,20 @@ if __name__ == '__main__':
   resource.setrlimit(resource.RLIMIT_STACK, (stack_size, stack_size))
 
   # Build and run.
+  macro = getattr(macro, args.macro) if args.macro else []
+  micro = getattr(micro, args.micro) if args.micro else []
   switches = args.switches.split(',')
   if args.build:
     build.install(switches, args.repository, args.jb, args.test, args.apps)
+  if args.apps and (macro or micro):
+    build.build(switches, args.jb, macro, micro)
   if args.apps and args.size:
     size.benchmark_size(switches, OPAMROOT, SIZE_PATH)
-  if args.apps and (args.macro and not args.perf):
-    tests = getattr(macro, args.macro)
-    run.benchmark_macro(tests, switches, args.n, args.jt, ROOT, MACRO_PATH)
-  if args.apps and (args.macro and args.perf):
-    tests = getattr(macro, args.macro)
-    perf.benchmark_macro(tests, switches, ROOT, PERF_PATH)
-  if args.apps and args.micro:
-    tests = getattr(micro, args.micro)
-    run.benchmark_micro(tests, switches, MICRO_PATH)
+  if args.apps and (macro and not args.perf):
+    run.benchmark_macro(macro, switches, args.n, args.jt, ROOT, MACRO_PATH)
+  if args.apps and (macro and args.perf):
+    perf.benchmark_macro(macro, switches, ROOT, PERF_PATH)
+  if args.apps and micro:
+    run.benchmark_micro(micro, switches, MICRO_PATH)
   if args.apps and args.disasm:
     disasm.benchmark_insts(switches, ROOT, DISASM_PATH)

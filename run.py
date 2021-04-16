@@ -84,8 +84,9 @@ def benchmark_macro(benchmarks, switches, n, jt, root, output):
 
   all_tests = []
   for _, bench, switch in itertools.product(range(n), benchmarks, switches):
-    for args in bench.args:
-      all_tests.append((bench, switch, args, root))
+    for test in bench.tests:
+      for args in test.args:
+        all_tests.append((test, switch, args, root))
   random.shuffle(all_tests)
 
   pool = multiprocessing.Pool(jt)
@@ -143,10 +144,11 @@ def benchmark_micro(benchmarks, switches, output):
   perf = defaultdict(dict)
   all_tests = list(itertools.product(benchmarks, switches))
   for bench, switch in tqdm.tqdm(all_tests):
-    micro_dir = os.path.abspath(os.path.join(output, os.pardir, 'log'))
-    bench_log = os.path.join(micro_dir, '{}.{}'.format(bench.name, switch))
-    if not os.path.exists(micro_dir):
-      os.makedirs(micro_dir)
+    for test in bench.tests:
+      micro_dir = os.path.abspath(os.path.join(output, os.pardir, 'log'))
+      bench_log = os.path.join(micro_dir, '{}.{}'.format(test.name, switch))
+      if not os.path.exists(micro_dir):
+        os.makedirs(micro_dir)
 
     result = _run_micro_test(bench.exe.format(switch))
     with open(bench_log, 'w') as f:

@@ -88,6 +88,8 @@ TEZOS_PACKAGES=[
   "lwt-exit", "lwt-canceler", "lwt-watcher",  "lwt_log", "lwt-watcher",
   "tls=0.11.1",
   "librustzcash",
+  "sodium",
+  "ocaml-vec"
 ]
 
 # Pinned packages.
@@ -315,10 +317,13 @@ def install(switches, repository, jb, test, apps):
             prefix=os.path.join(OPAMROOT, switch)
         )
 
-    # Build all benchmarks.
-    switch = switches[0]
-    _dune(jb, switch, '@build_macro')
-    _dune(jb, switch, '@build_micro')
-    _dune(jb, switch, '@build_compcert')
-    _dune(jb, switch, '@build_frama_c')
-    _dune(jb, switch, '@build_crypto')
+
+def build(switches, jb, macro, micro):
+  """Build all benchmarks."""
+  switch = switches[0]
+  for group in macro + micro:
+    kind, target = group.target.split(':')
+    if kind == 'opam':
+      _dune(jb, switch, target)
+      continue
+    raise Exception('Unknown target: {}'.format(group.target))

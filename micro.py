@@ -8,8 +8,12 @@ class Micro(object):
     self.name = name
     self.exe = '_build/{{0}}/micro/{0}/{0}.exe'.format(name)
 
+class Group(object):
+  def __init__(self, target, tests):
+    self.target = target
+    self.tests = tests
 
-ALL=[
+ALL=[Group('opam:@build_micro', [
   Micro('almabench'),
   Micro('bdd'),
   Micro('bigarray_rev'),
@@ -27,4 +31,4 @@ ALL=[
   Micro('sequence'),
   Micro('sieve'),
   Micro('vector_functor'),
-]
+])]

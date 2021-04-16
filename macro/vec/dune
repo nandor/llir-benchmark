@@ -1,0 +1,7 @@
+(executables
+ (libraries vec)
+ (names integer_dot)
+ (modules integer_dot)
+ (flags (:standard (-ccopt -static))))
+
+(alias (name build_vec) (deps integer_dot.exe))

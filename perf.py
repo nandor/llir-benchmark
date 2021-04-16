@@ -16,8 +16,9 @@ def benchmark_macro(benchmarks, switches, root, output):
 
   all_tests = []
   for bench, switch in itertools.product(benchmarks, switches):
-    for args in bench.args:
-      all_tests.append((bench, switch, args))
+    for test in bench.tests:
+      for args in test.args:
+        all_tests.append((test, switch, args))
 
   env={}
   for line in build.opam(['env', '--switch', switch], capture=True).split('\n'):
