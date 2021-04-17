@@ -1,0 +1,30 @@
+(executable
+  (name perm_count)
+  (libraries ref choice)
+  (modules perm_count)
+)
+
+(executable
+  (name synthetic)
+  (libraries ref)
+  (modules synthetic)
+)
+
+(executable
+  (name globroots)
+  (libraries ref)
+  (modules globroots)
+)
+
+(executable
+  (name local_roots)
+  (foreign_archives ../boxroot/boxroot)
+  (foreign_stubs (language c)
+    (extra_deps ../boxroot/boxroot.h)
+    (names local_roots_stubs)
+  )
+  (modules local_roots)
+)
+
+(alias (name build_boxroot) (deps perm_count.exe synthetic.exe globroots.exe local_roots.exe))
+

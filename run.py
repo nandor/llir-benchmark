@@ -58,19 +58,25 @@ def _run_macro_test(test):
       k, v = line.split(';')[0].strip().split('=')
       env[k] = v[1:-1]
 
+    exe_args = []
+    if isinstance(args, dict):
+      for k, v in args.items():
+        env[k] = v
+    else:
+        exe_args = [arg.format(bin=bin_dir, lib=lib_dir) for arg in args]
+
     task = subprocess.Popen([
           'taskset',
           '--cpu-list',
           str(cpu),
           exe
-        ] + [arg.format(bin=bin_dir, lib=lib_dir) for arg in args],
+        ] + exe_args,
         cwd=cwd,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
         env=env
     )
     child_pid, status, rusage = os.wait4(task.pid, 0)
-
     if status == 0:
       result = (rusage.ru_utime, rusage.ru_maxrss)
   except Exception as e:
@@ -97,7 +103,11 @@ def benchmark_macro(benchmarks, switches, n, jt, root, output):
     if e:
       failed.append((bench.exe.format(switch), ' '.join(args), e))
       continue
-    perf["{}.{}".format(bench.name, '_'.join(args))][switch].append(r)
+    if isinstance(args, dict):
+      name = '_'.join(v for k, v in args.items())
+    else:
+      name = '_'.join(args)
+    perf["{}.{}".format(bench.name, name)][switch].append(r)
   pool.close()
   pool.join()
 

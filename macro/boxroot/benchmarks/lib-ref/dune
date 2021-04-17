@@ -1,0 +1,14 @@
+(library
+  (name ref)
+  (foreign_archives ../../boxroot/boxroot)
+  (foreign_stubs (language c)
+    (extra_deps ../../boxroot/boxroot.h)
+    (names
+      abstract_out_of_heap
+      gc
+      boxroot
+      global
+      generational
+    )
+  )
+)

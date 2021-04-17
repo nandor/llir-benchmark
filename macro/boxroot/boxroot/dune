@@ -1,0 +1,8 @@
+(foreign_library
+ (archive_name boxroot)
+ (language c)
+ (names boxroot)
+ (flags -DENABLE_BOXROOT_MUTEX=%{env:ENABLE_BOXROOT_MUTEX=0})
+)
+
+

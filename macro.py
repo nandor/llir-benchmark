@@ -435,6 +435,56 @@ VEC = [Group('opam:@build_vec', [
   Macro(group='vec', name='integer_dot', args=[['10_000_000']])
 ])]
 
+BOXROOT=[Group('opam:@build_boxroot', [
+  Macro(group='boxroot/benchmarks', name='globroots', args=[
+    { 'N': '500_000', 'REF': 'gc' },
+    { 'N': '500_000', 'REF': 'boxroot' },
+    { 'N': '500_000', 'REF': 'ocaml' },
+    { 'N': '500_000', 'REF': 'global' },
+    { 'N': '500_000', 'REF': 'generational' },
+  ]),
+  Macro(group='boxroot/benchmarks', name='local_roots', args=[
+    { 'N':    '1', 'ROOT': 'local' },
+    { 'N':    '2', 'ROOT': 'local' },
+    { 'N':    '5', 'ROOT': 'local' },
+    { 'N':   '10', 'ROOT': 'local' },
+    { 'N':  '100', 'ROOT': 'local' },
+    { 'N': '1000', 'ROOT': 'local' },
+    { 'N':    '1', 'ROOT': 'boxroot' },
+    { 'N':    '2', 'ROOT': 'boxroot' },
+    { 'N':    '5', 'ROOT': 'boxroot' },
+    { 'N':   '10', 'ROOT': 'boxroot' },
+    { 'N':  '100', 'ROOT': 'boxroot' },
+    { 'N': '1000', 'ROOT': 'boxroot' },
+    { 'N':    '1', 'ROOT': 'generational' },
+    { 'N':    '2', 'ROOT': 'generational' },
+    { 'N':    '5', 'ROOT': 'generational' },
+    { 'N':   '10', 'ROOT': 'generational' },
+    { 'N':  '100', 'ROOT': 'generational' },
+    { 'N': '1000', 'ROOT': 'generational' },
+  ]),
+  Macro(group='boxroot/benchmarks', name='perm_count', args=[
+    {
+      'N': '10', 
+      'CHOICE': 'persistent', 
+      'REF': ref
+    } for ref in ['gc', 'boxroot', 'ocaml', 'global', 'generational']
+  ]),
+  Macro(group='boxroot/benchmarks', name='synthetic', args=[
+    {
+      'N': '8',
+      'SMALL_ROOTS': '10_000',
+      'LARGE_ROOTS': '20',
+      'SMALL_ROOT_PROMOTION_RATE': '0.2',
+      'LARGE_ROOT_PROMOTION_RATE': '1',
+      'ROOT_SURVIVAL_RATE': '0.99',
+      'GC_PROMOTION_RATE': '0.1',
+      'GC_SURVIVAL_RATE': '0.5',
+      'REF': ref
+    } for ref in ['gc', 'boxroot', 'ocaml', 'global', 'generational']
+  ]),
+])]
+
 MEDIUM =\
   ALMABENCH +\
   BDD +\
