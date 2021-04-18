@@ -2,7 +2,8 @@
 (executable
   (name fft)
   (modules fft)
-  (libraries complex))
+  (libraries complex)
+  (flags (:standard (-ccopt -static))))
 
 (library
   (name complex)
@@ -12,5 +13,5 @@
     (names complex_ext)))
 
 (alias
-  (name build_macro)
+  (name build_llir)
   (deps fft.exe))

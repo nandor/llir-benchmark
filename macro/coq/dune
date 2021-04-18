@@ -6,5 +6,5 @@
     (run coqc Int.v)))
 
 (alias
-  (name build_compcert)
+  (name build_coq)
   (deps Explode.v Int.vo AbstractInterpretation.v BasicSyntax.v))

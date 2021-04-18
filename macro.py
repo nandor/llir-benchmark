@@ -334,11 +334,11 @@ NBCODEC = [Group('opam:@build_macro', [
   ])
 ])]
 
-LLIR = [Group('opam:@build_macro', [
+LLIR = [Group('opam:@build_llir', [
   Macro(group='llir', name='fft', args=['1024'])
 ])]
 
-COQ = [Group('opam:@build_macro', [
+COQ = [Group('opam:@build_coq', [
   Macro(group='coq', name='coq', exe='coqc', args=[
     ['Explode.v'],
     ['AbstractInterpretation.v'],
@@ -465,8 +465,8 @@ BOXROOT=[Group('opam:@build_boxroot', [
   ]),
   Macro(group='boxroot/benchmarks', name='perm_count', args=[
     {
-      'N': '10', 
-      'CHOICE': 'persistent', 
+      'N': '10',
+      'CHOICE': 'persistent',
       'REF': ref
     } for ref in ['gc', 'boxroot', 'ocaml', 'global', 'generational']
   ]),

@@ -30,10 +30,8 @@ let rec fft v =
   fft_in_place x n;
   x
 
-
-let () =
+let test n =
   let freqs = [2.; 5.; 11.; 17.; 29.] in
-  let n = (try int_of_string (Sys.argv.(1)) with _ -> 64) in
   let x = Complex.vec_init n (fun i ->
     let r = float_of_int i /. float_of_int n in
     Complex.make (List.fold_left (+.) 0.0 (List.map (fun freq ->
@@ -47,3 +45,7 @@ let () =
     let vi = Complex.abs (Complex.vec_get v i) in
     Printf.eprintf "% 3d\t%+ 2.5f\t% 2.5f\n" i xi vi;
   done
+
+let () =
+  let n = (try int_of_string (Sys.argv.(1)) with _ -> 64) in
+  test n

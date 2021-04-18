@@ -30,7 +30,8 @@ OPT = ['O0', 'O1', 'O2', 'O3', 'O4', 'Os']
 CORE_PACKAGES=[
   "alcotest", "alt-ergo-free", "angstrom", "atdgen", "atdj", "atds", "base",
   "base64", "bheap", "bigstringaf", "biniou", "bos", "camlp4", "camlp5",
-  "camlzip", "cmitomli", "compcert", "coq", "cpdf", "cppo", "crowbar", "csexp",
+  "camlzip", "cmitomli", "compcert", "coq=8.13.0+llir", "cpdf", "cppo", "crowbar", 
+  "csexp",
   "cstruct", "cstruct-sexp", "cstruct-unix", "cubicle", "digestif", "diy",
   "domain-name", "dune", "duration", "easy-format", "eqaf", "fix", "frama-c",
   "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin-test",
