@@ -1,6 +1,31 @@
-(executable
-	(name irmin_mem_rw)
-	(modules irmin_mem_rw)
-	(libraries irmin irmin.mem lwt.unix))
+(library
+ (name bench_common)
+ (modules bench_common)
+ (libraries irmin-pack unix progress progress.unix uuidm))
 
-(alias (name build_macro) (deps irmin_mem_rw.exe))
+(executable
+ (name irmin_mem_rw)
+ (modules irmin_mem_rw)
+ (libraries irmin irmin.mem lwt.unix))
+
+(executable
+ (name tree)
+ (modules tree)
+ (preprocess
+  (pps ppx_deriving_yojson ppx_repr))
+ (libraries irmin-pack irmin-pack.layered irmin-test.bench irmin-layers lwt
+   unix cmdliner logs yojson ppx_deriving_yojson memtrace repr ppx_repr
+   bench_common mtime mtime.clock.os bentov))
+
+(executables
+ (names main layers)
+ (modules main layers import)
+ (preprocess
+  (pps ppx_deriving_yojson ppx_repr))
+ (libraries irmin-pack irmin-pack.layered irmin-test.bench irmin-layers lwt
+   unix cmdliner logs yojson ppx_deriving_yojson memtrace repr ppx_repr
+   bench_common))
+
+(alias 
+  (name build_irmin) 
+  (deps irmin_mem_rw.exe layers.exe main.exe tree.exe))

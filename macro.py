@@ -396,14 +396,19 @@ CUBICLE = [Group('opam:@build_macro', [
   ])
 ])]
 
-IRMIN = [Group('opam:@build_macro', [
+IRMIN = [Group('opam:@build_irmin', [
   Macro(group='irmin', name='irmin_mem_rw', args=[
     [ '10_000', '50_000', '80', '100_000_000' ],
     [ '10_000', '50_000', '20', '100_000_000' ]
   ]),
-  #Macro(group='irmin', name='layers', args=[
-  #  [ '-n', '500' ]
-  #])
+  Macro(group='irmin', name='layers', args=[
+    [ '-n', '500' ],
+    [ '-n', '150' ]
+  ]),
+  Macro(group='irmin', name='main', args=[
+    [ '-n', '100' ],
+    [ '-n', '500' ]
+  ])
 ])]
 
 THREAD_LWT = [Group('opam:@build_macro', [

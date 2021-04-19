@@ -41,10 +41,10 @@ CORE_PACKAGES=[
   "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reason", "result",
   "rml", "sexplib", "sexplib0", "stdio", "stringext", "tyxml", "ucaml",  "uri",
   "uucp",  "uuidm", "why3", "yojson", "zarith", "zlib", "irmin", "index",
-  "repr", "memtrace", "irmin-pack>=2.4.0",
+  "repr", "memtrace", "irmin-pack=2.5.3",
   "ppx_deriving_yojson", "ppx_repr",
   "ocplib-endian", "ocplib-simplex",
-  "lwt", "lwt-dllist", "hacl", "hacl-star", "sodium"
+  "lwt", "lwt-dllist", "hacl", "hacl-star", "sodium", "bentov"
 ]
 
 # List of mirage-specific packages.
