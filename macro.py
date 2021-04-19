@@ -350,7 +350,7 @@ COQ = [Group('opam:@build_coq', [
   ])
 ])]
 
-COMPCERT = [Group('opam:@build_macro', [
+COMPCERT = [Group('opam:@build_compcert', [
   Macro(group='compcert', name='compcert', exe='ccomp', args=[
     ['sqlite3.i', '-fbitfields', '-fstruct-passing', '-c', '-S']
   ])
