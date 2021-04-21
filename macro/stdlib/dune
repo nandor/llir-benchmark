@@ -30,3 +30,5 @@
     stack_bench.exe
     str_bench.exe
     string_bench.exe))
+
+(alias (name build_stdlib_string) (deps string_bench.exe))

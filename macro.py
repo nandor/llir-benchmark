@@ -187,7 +187,7 @@ SIMPLE_TESTS = [Group('opam:@build_macro', [
   ]),
 ])]
 
-STDLIB = [Group('opam:@build_macro', [
+STDLIB_MISC = [Group('opam:@build_macro', [
   Macro(group='stdlib', name='stack_bench', args=[
     ["stack_fold", "10_000_000"],
     ["stack_push_pop", "500_000_000"],
@@ -197,7 +197,6 @@ STDLIB = [Group('opam:@build_macro', [
     ["array_fold", "1000", "1_000_000"],
     ["array_iter", "1000", "1_000_000"],
   ]),
-
   Macro(group='stdlib', name='bytes_bench', args=[
     ["bytes_get", "200_000_000"],
     ["bytes_sub", "200_000_000"],
@@ -233,20 +232,6 @@ STDLIB = [Group('opam:@build_macro', [
     ["hashtbl_find", "60_000_000"],
     ["hashtbl_filter_map", "100_000"],
   ]),
-  Macro(group='stdlib', name='string_bench', args=[
-    ["string_get", "50_000_000"],
-    ["string_sub", "50000000"],
-    ["string_blit", "25000000"],
-    ["string_concat", "20000000"],
-    ["string_map", "20000000"],
-    ["string_trim", "100_000_000"],
-    ["string_index", "250_000_000"],
-    ["string_contains", "250_000_000"],
-    ["string_uppercase_ascii", "1000000"],
-    ["string_split_on_char", "500000"],
-    ["string_compare", "100_000"],
-    ["string_equal", "25000"],
-  ]),
   Macro(group='stdlib', name='str_bench', args=[
     ["str_regexp", "1000000"],
     ["str_string_match", "50000000"],
@@ -280,6 +265,26 @@ STDLIB = [Group('opam:@build_macro', [
     ["big_array_int32_rev", "1024", "200_000"],
   ])
 ])]
+STDLIB_STRING = [Group('opam:@build_stdlib_string', [
+  Macro(group='stdlib', name='string_bench', args=[
+    ["string_get", "50_000_000"],
+    ["string_sub", "50000000"],
+    ["string_blit", "25000000"],
+    ["string_concat", "20000000"],
+    ["string_map", "20000000"],
+    ["string_trim", "100_000_000"],
+    ["string_index", "250_000_000"],
+    ["string_contains", "250_000_000"],
+    ["string_uppercase_ascii", "1000000"],
+    ["string_split_on_char", "500000"],
+    ["string_compare", "100_000"],
+    ["string_equal", "25000"],
+  ])
+])]
+
+STDLIB=\
+  STDLIB_MISC+\
+  STDLIB_STRING
 
 SEQUENCE = [Group('opam:@build_macro', [
   Macro(group='sequence', name='sequence_cps', args=[['10000']])
