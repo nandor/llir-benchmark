@@ -187,16 +187,22 @@ SIMPLE_TESTS = [Group('opam:@build_macro', [
   ]),
 ])]
 
-STDLIB_MISC = [Group('opam:@build_macro', [
+STDLIB_STACK = [Group('opam:@build_stdlib_stack', [
   Macro(group='stdlib', name='stack_bench', args=[
     ["stack_fold", "10_000_000"],
     ["stack_push_pop", "500_000_000"],
-  ]),
+  ])
+])]
+
+STDLIB_ARRAY = [Group('opam:@build_stdlib_array', [
   Macro(group='stdlib', name='array_bench', args=[
     ["array_forall", "1000", "1_000_000"],
     ["array_fold", "1000", "1_000_000"],
     ["array_iter", "1000", "1_000_000"],
-  ]),
+  ])
+])]
+
+STDLIB_BYTES = [Group('opam:@build_stdlib_bytes', [
   Macro(group='stdlib', name='bytes_bench', args=[
     ["bytes_get", "200_000_000"],
     ["bytes_sub", "200_000_000"],
@@ -210,12 +216,18 @@ STDLIB_MISC = [Group('opam:@build_macro', [
     ["bytes_uppercase_ascii", "1_000_000"],
     ["bytes_set", "1_000_000_000"],
     ["bytes_cat", "1_000_000_000"],
-  ]),
+  ])
+])]
+
+STDLIB_SET = [Group('opam:@build_stdlib_set', [
   Macro(group='stdlib', name='set_bench', args=[
     ["set_fold", "1000000"],
     ["set_add_rem", "20000000"],
     ["set_mem", "50000000"],
-  ]),
+  ])
+])]
+
+STDLIB_HASHTBL = [Group('opam:@build_stdlib_hashtbl', [
   Macro(group='stdlib', name='hashtbl_bench', args=[
     ["int_replace1", "100_000"],
     ["int_find1", "200_000"],
@@ -231,7 +243,10 @@ STDLIB_MISC = [Group('opam:@build_macro', [
     ["hashtbl_remove", "40_000_000"],
     ["hashtbl_find", "60_000_000"],
     ["hashtbl_filter_map", "100_000"],
-  ]),
+  ])
+])]
+
+STDLIB_STR = [Group('opam:@build_stdlib_str', [
   Macro(group='stdlib', name='str_bench', args=[
     ["str_regexp", "1000000"],
     ["str_string_match", "50000000"],
@@ -239,7 +254,10 @@ STDLIB_MISC = [Group('opam:@build_macro', [
     ["str_string_partial_match", "250_000_000"],
     ["str_global_replace", "1000000"],
     ["str_split", "2000000"],
-  ]),
+  ])
+])]
+
+STDLIB_PERVASIVES = [Group('opam:@build_stdlib_pervasives', [
   Macro(group='stdlib', name='pervasives_bench', args=[
     ["pervasives_equal_lists", "1000000000"],
     ["pervasives_compare_lists", "100000000"],
@@ -249,7 +267,10 @@ STDLIB_MISC = [Group('opam:@build_macro', [
     ["pervasives_compare_floats", "200000000"],
     ["pervasives_equal_strings", "20000000"],
     ["pervasives_compare_strings", "20000000"],
-  ]),
+  ])
+])]
+
+STDLIB_MAP = [Group('opam:@build_stdlib_map', [
   Macro(group='stdlib', name='map_bench', args=[
     ["map_iter", "50_000"],
     ["map_add", "1_000_000"],
@@ -259,12 +280,16 @@ STDLIB_MISC = [Group('opam:@build_macro', [
     ["map_for_all", "50_000"],
     ["map_find", "10_000_000"],
     ["map_map", "10_000"],
-  ]),
+  ])
+])]
+
+STDLIB_BIG_ARRAY = [Group('opam:@build_stdlib_big_array', [
   Macro(group='stdlib', name='big_array_bench', args=[
     ["big_array_int_rev", "1024", "200_000"],
     ["big_array_int32_rev", "1024", "200_000"],
   ])
 ])]
+
 STDLIB_STRING = [Group('opam:@build_stdlib_string', [
   Macro(group='stdlib', name='string_bench', args=[
     ["string_get", "50_000_000"],
@@ -283,8 +308,150 @@ STDLIB_STRING = [Group('opam:@build_stdlib_string', [
 ])]
 
 STDLIB=\
-  STDLIB_MISC+\
+  STDLIB_STACK+\
+  STDLIB_ARRAY+\
+  STDLIB_BYTES+\
+  STDLIB_SET+\
+  STDLIB_HASHTBL+\
+  STDLIB_STR+\
+  STDLIB_PERVASIVES+\
+  STDLIB_MAP+\
+  STDLIB_BIG_ARRAY+\
   STDLIB_STRING
+
+STDLIB_STATIC_STACK = [Group('opam:@build_stdlib_stack', [
+  Macro(group='stdlib_static', name='stack_bench', args=[
+    ["stack_fold", "10_000_000"],
+    ["stack_push_pop", "500_000_000"],
+  ])
+])]
+
+STDLIB_STATIC_ARRAY = [Group('opam:@build_stdlib_array', [
+  Macro(group='stdlib_static', name='array_bench', args=[
+    ["array_forall", "1000", "1_000_000"],
+    ["array_fold", "1000", "1_000_000"],
+    ["array_iter", "1000", "1_000_000"],
+  ])
+])]
+
+STDLIB_STATIC_BYTES = [Group('opam:@build_stdlib_bytes', [
+  Macro(group='stdlib_static', name='bytes_bench', args=[
+    ["bytes_get", "200_000_000"],
+    ["bytes_sub", "200_000_000"],
+    ["bytes_blit", "50_000_000"],
+    ["bytes_concat", "20_000_000"],
+    ["bytes_iter", "10_000_000"],
+    ["bytes_map", "10_000_000"],
+    ["bytes_trim", "20_500_000"],
+    ["bytes_index", "10_000_000"],
+    ["bytes_contains", "100_000_000"],
+    ["bytes_uppercase_ascii", "1_000_000"],
+    ["bytes_set", "1_000_000_000"],
+    ["bytes_cat", "1_000_000_000"],
+  ])
+])]
+
+STDLIB_STATIC_SET = [Group('opam:@build_stdlib_set', [
+  Macro(group='stdlib_static', name='set_bench', args=[
+    ["set_fold", "1000000"],
+    ["set_add_rem", "20000000"],
+    ["set_mem", "50000000"],
+  ])
+])]
+
+STDLIB_STATIC_HASHTBL = [Group('opam:@build_stdlib_hashtbl', [
+  Macro(group='stdlib_static', name='hashtbl_bench', args=[
+    ["int_replace1", "100_000"],
+    ["int_find1", "200_000"],
+    ["caml_hash_int", "200_000"],
+    ["caml_hash_tuple", "100_000"],
+    ["int_replace2", "100_000"],
+    ["int_find2", "500_000"],
+    ["hashtbl_iter", "200_000"],
+    ["hashtbl_fold", "200_000"],
+    ["hashtbl_add_resizing", "4_000_000"],
+    ["hashtbl_add_sized", "6_000_000"],
+    ["hashtbl_add_duplicate", "2_000_000"],
+    ["hashtbl_remove", "40_000_000"],
+    ["hashtbl_find", "60_000_000"],
+    ["hashtbl_filter_map", "100_000"],
+  ])
+])]
+
+STDLIB_STATIC_STR = [Group('opam:@build_stdlib_str', [
+  Macro(group='stdlib_static', name='str_bench', args=[
+    ["str_regexp", "1000000"],
+    ["str_string_match", "50000000"],
+    ["str_search_forward", "5000000"],
+    ["str_string_partial_match", "250_000_000"],
+    ["str_global_replace", "1000000"],
+    ["str_split", "2000000"],
+  ])
+])]
+
+STDLIB_STATIC_PERVASIVES = [Group('opam:@build_stdlib_pervasives', [
+  Macro(group='stdlib_static', name='pervasives_bench', args=[
+    ["pervasives_equal_lists", "1000000000"],
+    ["pervasives_compare_lists", "100000000"],
+    ["pervasives_equal_ints", "1000000000"],
+    ["pervasives_compare_ints", "1000000000"],
+    ["pervasives_equal_floats", "1000000000"],
+    ["pervasives_compare_floats", "200000000"],
+    ["pervasives_equal_strings", "20000000"],
+    ["pervasives_compare_strings", "20000000"],
+  ])
+])]
+
+STDLIB_STATIC_MAP = [Group('opam:@build_stdlib_map', [
+  Macro(group='stdlib_static', name='map_bench', args=[
+    ["map_iter", "50_000"],
+    ["map_add", "1_000_000"],
+    ["map_add_duplicate", "1000000"],
+    ["map_remove", "10_000_000"],
+    ["map_fold", "50_000"],
+    ["map_for_all", "50_000"],
+    ["map_find", "10_000_000"],
+    ["map_map", "10_000"],
+  ])
+])]
+
+STDLIB_STATIC_BIG_ARRAY = [Group('opam:@build_stdlib_big_array', [
+  Macro(group='stdlib_static', name='big_array_bench', args=[
+    ["big_array_int_rev", "1024", "200_000"],
+    ["big_array_int32_rev", "1024", "200_000"],
+  ])
+])]
+
+STDLIB_STATIC_STRING = [Group('opam:@build_stdlib_string', [
+  Macro(group='stdlib_static', name='string_bench', args=[
+    ["string_get", "50_000_000"],
+    ["string_sub", "50000000"],
+    ["string_blit", "25000000"],
+    ["string_concat", "20000000"],
+    ["string_map", "20000000"],
+    ["string_trim", "100_000_000"],
+    ["string_index", "250_000_000"],
+    ["string_contains", "250_000_000"],
+    ["string_uppercase_ascii", "1000000"],
+    ["string_split_on_char", "500000"],
+    ["string_compare", "100_000"],
+    ["string_equal", "25000"],
+  ])
+])]
+
+STDLIB_STATIC=\
+  STDLIB_STATIC_STACK+\
+  STDLIB_STATIC_ARRAY+\
+  STDLIB_STATIC_BYTES+\
+  STDLIB_STATIC_SET+\
+  STDLIB_STATIC_HASHTBL+\
+  STDLIB_STATIC_STR+\
+  STDLIB_STATIC_PERVASIVES+\
+  STDLIB_STATIC_MAP+\
+  STDLIB_STATIC_BIG_ARRAY+\
+  STDLIB_STATIC_STRING
+
+STDLIB=STDLIB+STDLIB_STATIC
 
 SEQUENCE = [Group('opam:@build_macro', [
   Macro(group='sequence', name='sequence_cps', args=[['10000']])
@@ -496,21 +663,22 @@ BOXROOT=[Group('opam:@build_boxroot', [
 ])]
 
 MEDIUM =\
-  ALMABENCH +\
-  BDD +\
-  BENCHMARKSGAME +\
-  CHAMENEOS +\
-  KB +\
-  NUMERICAL_ANALYSIS +\
-  MENHIR +\
-  SIMPLE_TESTS +\
-  STDLIB +\
-  YOJSON +\
-  ZARITH +\
-  MINILIGHT +\
-  JSONM +\
-  CPDF +\
-  NBCODEC +\
+  ALMABENCH+\
+  BDD+\
+  BENCHMARKSGAME+\
+  CHAMENEOS+\
+  KB+\
+  NUMERICAL_ANALYSIS+\
+  MENHIR+\
+  SIMPLE_TESTS+\
+  STDLIB+\
+  STDLIB_STATIC+\
+  YOJSON+\
+  ZARITH+\
+  MINILIGHT+\
+  JSONM+\
+  CPDF+\
+  NBCODEC+\
   LLIR+\
   FRAMA_C+\
   CUBICLE+\

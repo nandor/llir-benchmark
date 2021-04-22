@@ -59,7 +59,6 @@ if __name__ == '__main__':
       type=str,
       action='store',
       default=None,
-      choices=[n for n in dir(macro) if not n.startswith('__') and n != 'Macro'],
       help='macro benchmark to run'
   )
   parser.add_argument(
@@ -67,7 +66,6 @@ if __name__ == '__main__':
       type=str,
       action='store',
       default=None,
-      choices=[n for n in dir(micro) if not n.startswith('__') and n != 'Micro'],
       help='benchmark to run'
   )
   parser.add_argument(
@@ -133,21 +131,26 @@ if __name__ == '__main__':
   stack_size = 128 * 1024 * 1024
   resource.setrlimit(resource.RLIMIT_STACK, (stack_size, stack_size))
 
+  macro_tests = []
+  if args.macro:
+    macro_tests = sum([getattr(macro, m) for m in args.macro.split(',')], [])
+  micro_tests = []
+  if args.micro:
+    micro_tests = sum([getattr(micro, m) for m in args.micro.split(',')], [])
+
   # Build and run.
-  macro = getattr(macro, args.macro) if args.macro else []
-  micro = getattr(micro, args.micro) if args.micro else []
   switches = args.switches.split(',')
   if args.build:
     build.install(switches, args.repository, args.jb, args.test, args.apps)
-  if args.apps and (macro or micro):
-    build.build(switches, args.jb, macro, micro)
+  if args.apps and (macro_tests or micro_tests):
+    build.build(switches, args.jb, macro_tests, micro_tests)
   if args.apps and args.size:
     size.benchmark_size(switches, OPAMROOT, SIZE_PATH)
-  if args.apps and (macro and not args.perf):
-    run.benchmark_macro(macro, switches, args.n, args.jt, ROOT, MACRO_PATH)
-  if args.apps and (macro and args.perf):
-    perf.benchmark_macro(macro, switches, ROOT, PERF_PATH)
-  if args.apps and micro:
-    run.benchmark_micro(micro, switches, MICRO_PATH)
+  if args.apps and (macro_tests and not args.perf):
+    run.benchmark_macro(macro_tests, switches, args.n, args.jt, ROOT, MACRO_PATH)
+  if args.apps and (macro_tests and args.perf):
+    perf.benchmark_macro(macro_tests, switches, ROOT, PERF_PATH)
+  if args.apps and micro_tests:
+    run.benchmark_micro(micro_tests, switches, MICRO_PATH)
   if args.apps and args.disasm:
     disasm.benchmark_insts(switches, ROOT, DISASM_PATH)

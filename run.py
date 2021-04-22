@@ -64,7 +64,7 @@ def _run_macro_test(test):
         env[k] = v
     else:
         exe_args = [arg.format(bin=bin_dir, lib=lib_dir) for arg in args]
-    
+
     task = subprocess.Popen([
           'taskset',
           '--cpu-list',
@@ -107,7 +107,7 @@ def benchmark_macro(benchmarks, switches, n, jt, root, output):
       name = '_'.join(v for k, v in args.items())
     else:
       name = '_'.join(args)
-    perf["{}.{}".format(bench.name, name)][switch].append(r)
+    perf["{}/{}.{}".format(bench.group, bench.name, name)][switch].append(r)
   pool.close()
   pool.join()
 

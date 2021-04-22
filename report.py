@@ -44,6 +44,6 @@ for bench, runs in data.items():
     else:
       times += ' ' * 8
 
-  if len(bench) > 27:
-    bench = bench[:27] + '...'
-  print('{} {}'.format(bench.ljust(30), times))
+  if len(bench) > 60:
+    bench = bench[:60] + '...'
+  print('{} {}'.format(bench.ljust(60), times))
