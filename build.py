@@ -17,10 +17,16 @@ OPAMROOT=os.path.join(ROOT, '_opam')
 # Enumeration of supported targets.
 CPUS = {
   'i686': [],
-  'amd64': ['zen2', 'skylake', 'tremont'],
+  'amd64': ['generic', 'zen2', 'skylake', 'tremont'],
   'arm64': ['cortex-a72'],
   'riscv': ['sifive-u74'],
   'power': ['pwr8', 'pwr9']
+}
+# Enumeration of custom configurations.
+CONFIG = {
+  'no-code-layout': {
+    'LLIR_OPT_DISABLED': 'code-layout'
+  }
 }
 
 # Enumeration of opt levels.
@@ -30,7 +36,7 @@ OPT = ['O0', 'O1', 'O2', 'O3', 'O4', 'Os']
 CORE_PACKAGES=[
   "alcotest", "alt-ergo-free", "angstrom", "atdgen", "atdj", "atds", "base",
   "base64", "bheap", "bigstringaf", "biniou", "bos", "camlp4", "camlp5",
-  "camlzip", "cmitomli", "compcert", "coq=8.13.0+llir", "cpdf", "cppo", "crowbar", 
+  "camlzip", "cmitomli", "compcert", "coq=8.13.0+llir", "cpdf", "cppo", "crowbar",
   "csexp",
   "cstruct", "cstruct-sexp", "cstruct-unix", "cubicle", "digestif", "diy",
   "domain-name", "dune", "duration", "easy-format", "eqaf", "fix", "frama-c",
@@ -152,6 +158,12 @@ for arch, cpus in CPUS.items():
   PACKAGES[f'{arch}+tezos+llir'] = TEZOS_PACKAGES
   PINNED[f'{arch}+tezos+llir'] = TEZOS_PINNED
 
+  for cfg, _ in CONFIG.items():
+    SWITCHES[f'{arch}+ref+{cfg}'] = [
+        f'ocaml-variants.4.11.1.master',
+        f'arch-{arch}'
+    ]
+
   for opt in OPT:
     SWITCHES[f'{arch}+llir+{opt}'] = [
         f'ocaml-variants.4.11.1.master+llir',
@@ -176,6 +188,17 @@ for arch, cpus in CPUS.items():
           f'arch-{arch}',
           f'llir-config.{opt}'
       ]
+      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = CORE_PACKAGES
+      PINNED[f'{arch}+llir+{opt}+{cfg}'] = CORE_PINNED
+
+    for cfg, _ in CONFIG.items():
+      SWITCHES[f'{arch}+llir+{opt}+{cfg}'] = [
+          f'ocaml-variants.4.11.1.master+llir',
+          f'arch-{arch}',
+          f'llir-config.{opt}+{cfg}'
+      ]
+      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = CORE_PACKAGES
+      PINNED[f'{arch}+llir+{opt}+{cfg}'] = CORE_PINNED
 
 for arch in ['amd64', 'arm64']:
   SWITCHES[f'{arch}+mirage+ref'] = [
@@ -250,9 +273,45 @@ def _dune(jb, switch, target):
       target
   ])
 
+CONFIG_TEMPLATE=\
+'''
+opam-version: "2.0"
+maintainer: "n@ndor.email"
+homepage: "https://github.com/nandor/llir-opt"
+bug-reports: "https://github.com/nandor/llir-opam-repository/issues"
+authors: ["Nandor Licker" "Timothy M. Jones"]
+license: "MIT"
+setenv: [[LLIR_OPT_O = "-{}"] {} ]
+synopsis: "LLIR Configuration"
+description: "This package overrides configuration options for llir-opt"
+flags: conf
+'''
 
 def install(switches, repository, jb, test, apps):
   """Installs the switches and the required packages."""
+
+  # Create the repository with custom LLIR configs.
+  os.makedirs(os.path.join(ROOT, '_repo'), exist_ok=True)
+  repo = os.path.join(ROOT, '_repo', 'repo')
+  if not os.path.exists(repo):
+    with open(repo, 'w') as f:
+      f.write('opam-version: "2.0"')
+
+  for opt in OPT:
+    for cfg, envs in CONFIG.items():
+      path = os.path.join(
+          ROOT,
+          '_repo',
+          'packages',
+          'llir-config',
+          f'llir-config.{opt}+{cfg}'
+      )
+      os.makedirs(path, exist_ok=True)
+      with open(os.path.join(path, 'opam'), 'w') as f:
+        f.write(CONFIG_TEMPLATE.format(
+          opt,
+          ''.join(f'[{key} = "{val}"]' for key, val in envs.items())
+        ))
 
   # Set up the workspace file.
   with open(os.path.join(ROOT, 'dune-workspace'), 'w') as f:
@@ -278,7 +337,11 @@ def install(switches, repository, jb, test, apps):
           switch,
           '--yes',
           '--empty',
-          '--repos', 'llir={},default'.format(repository)
+          '--repos',
+          'config=file://{},llir={},default'.format(
+              os.path.join(ROOT, '_repo'),
+              repository
+          )
       ])
   opam(['update'])
 

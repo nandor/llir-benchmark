@@ -1,6 +1,7 @@
 dune-workspace
 _opam
 _build
+_repo
 _result
 .merlin
 __pycache__

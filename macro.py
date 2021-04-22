@@ -320,14 +320,14 @@ STDLIB=\
   STDLIB_STRING
 
 STDLIB_STATIC_STACK = [Group('opam:@build_stdlib_stack', [
-  Macro(group='stdlib_static', name='stack_bench', args=[
+  Macro(group='stdlib-static', name='stack_bench', args=[
     ["stack_fold", "10_000_000"],
     ["stack_push_pop", "500_000_000"],
   ])
 ])]
 
 STDLIB_STATIC_ARRAY = [Group('opam:@build_stdlib_array', [
-  Macro(group='stdlib_static', name='array_bench', args=[
+  Macro(group='stdlib-static', name='array_bench', args=[
     ["array_forall", "1000", "1_000_000"],
     ["array_fold", "1000", "1_000_000"],
     ["array_iter", "1000", "1_000_000"],
@@ -335,7 +335,7 @@ STDLIB_STATIC_ARRAY = [Group('opam:@build_stdlib_array', [
 ])]
 
 STDLIB_STATIC_BYTES = [Group('opam:@build_stdlib_bytes', [
-  Macro(group='stdlib_static', name='bytes_bench', args=[
+  Macro(group='stdlib-static', name='bytes_bench', args=[
     ["bytes_get", "200_000_000"],
     ["bytes_sub", "200_000_000"],
     ["bytes_blit", "50_000_000"],
@@ -352,7 +352,7 @@ STDLIB_STATIC_BYTES = [Group('opam:@build_stdlib_bytes', [
 ])]
 
 STDLIB_STATIC_SET = [Group('opam:@build_stdlib_set', [
-  Macro(group='stdlib_static', name='set_bench', args=[
+  Macro(group='stdlib-static', name='set_bench', args=[
     ["set_fold", "1000000"],
     ["set_add_rem", "20000000"],
     ["set_mem", "50000000"],
@@ -360,7 +360,7 @@ STDLIB_STATIC_SET = [Group('opam:@build_stdlib_set', [
 ])]
 
 STDLIB_STATIC_HASHTBL = [Group('opam:@build_stdlib_hashtbl', [
-  Macro(group='stdlib_static', name='hashtbl_bench', args=[
+  Macro(group='stdlib-static', name='hashtbl_bench', args=[
     ["int_replace1", "100_000"],
     ["int_find1", "200_000"],
     ["caml_hash_int", "200_000"],
@@ -379,7 +379,7 @@ STDLIB_STATIC_HASHTBL = [Group('opam:@build_stdlib_hashtbl', [
 ])]
 
 STDLIB_STATIC_STR = [Group('opam:@build_stdlib_str', [
-  Macro(group='stdlib_static', name='str_bench', args=[
+  Macro(group='stdlib-static', name='str_bench', args=[
     ["str_regexp", "1000000"],
     ["str_string_match", "50000000"],
     ["str_search_forward", "5000000"],
@@ -390,7 +390,7 @@ STDLIB_STATIC_STR = [Group('opam:@build_stdlib_str', [
 ])]
 
 STDLIB_STATIC_PERVASIVES = [Group('opam:@build_stdlib_pervasives', [
-  Macro(group='stdlib_static', name='pervasives_bench', args=[
+  Macro(group='stdlib-static', name='pervasives_bench', args=[
     ["pervasives_equal_lists", "1000000000"],
     ["pervasives_compare_lists", "100000000"],
     ["pervasives_equal_ints", "1000000000"],
@@ -403,7 +403,7 @@ STDLIB_STATIC_PERVASIVES = [Group('opam:@build_stdlib_pervasives', [
 ])]
 
 STDLIB_STATIC_MAP = [Group('opam:@build_stdlib_map', [
-  Macro(group='stdlib_static', name='map_bench', args=[
+  Macro(group='stdlib-static', name='map_bench', args=[
     ["map_iter", "50_000"],
     ["map_add", "1_000_000"],
     ["map_add_duplicate", "1000000"],
@@ -416,14 +416,14 @@ STDLIB_STATIC_MAP = [Group('opam:@build_stdlib_map', [
 ])]
 
 STDLIB_STATIC_BIG_ARRAY = [Group('opam:@build_stdlib_big_array', [
-  Macro(group='stdlib_static', name='big_array_bench', args=[
+  Macro(group='stdlib-static', name='big_array_bench', args=[
     ["big_array_int_rev", "1024", "200_000"],
     ["big_array_int32_rev", "1024", "200_000"],
   ])
 ])]
 
 STDLIB_STATIC_STRING = [Group('opam:@build_stdlib_string', [
-  Macro(group='stdlib_static', name='string_bench', args=[
+  Macro(group='stdlib-static', name='string_bench', args=[
     ["string_get", "50_000_000"],
     ["string_sub", "50000000"],
     ["string_blit", "25000000"],
