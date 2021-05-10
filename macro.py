@@ -292,18 +292,18 @@ STDLIB_BIG_ARRAY = [Group('opam:@build_stdlib_big_array', [
 
 STDLIB_STRING = [Group('opam:@build_stdlib_string', [
   Macro(group='stdlib', name='string_bench', args=[
-    ["string_get", "50_000_000"],
-    ["string_sub", "50000000"],
-    ["string_blit", "25000000"],
-    ["string_concat", "20000000"],
-    ["string_map", "20000000"],
+    ["string_get", "1_000_000_000"],
+    ["string_sub", "200_000_000"],
+    ["string_blit", "100_000_000"],
+    ["string_concat", "20_000_000"],
+    ["string_map", "20_000_000"],
     ["string_trim", "100_000_000"],
     ["string_index", "250_000_000"],
     ["string_contains", "250_000_000"],
-    ["string_uppercase_ascii", "1000000"],
-    ["string_split_on_char", "500000"],
+    ["string_uppercase_ascii", "4_000_000"],
+    ["string_split_on_char", "2_000_000"],
     ["string_compare", "100_000"],
-    ["string_equal", "25000"],
+    ["string_equal", "50_000"],
   ])
 ])]
 
@@ -424,18 +424,18 @@ STDLIB_STATIC_BIG_ARRAY = [Group('opam:@build_stdlib_big_array', [
 
 STDLIB_STATIC_STRING = [Group('opam:@build_stdlib_string', [
   Macro(group='stdlib-static', name='string_bench', args=[
-    ["string_get", "50_000_000"],
-    ["string_sub", "50000000"],
-    ["string_blit", "25000000"],
-    ["string_concat", "20000000"],
-    ["string_map", "20000000"],
+    ["string_get", "1_000_000_000"],
+    ["string_sub", "200_000_000"],
+    ["string_blit", "100_000_000"],
+    ["string_concat", "20_000_000"],
+    ["string_map", "20_000_000"],
     ["string_trim", "100_000_000"],
     ["string_index", "250_000_000"],
     ["string_contains", "250_000_000"],
-    ["string_uppercase_ascii", "1000000"],
-    ["string_split_on_char", "500000"],
+    ["string_uppercase_ascii", "4_000_000"],
+    ["string_split_on_char", "2_000_000"],
     ["string_compare", "100_000"],
-    ["string_equal", "25000"],
+    ["string_equal", "50_000"],
   ])
 ])]
 
