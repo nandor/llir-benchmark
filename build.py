@@ -26,6 +26,9 @@ CPUS = {
 CONFIG = {
   'no-code-layout': {
     'LLIR_OPT_DISABLED': 'code-layout'
+  },
+  'no-eliminate-tags': {
+    'LLIR_OPT_DISABLED': 'eliminate-tags'
   }
 }
 
