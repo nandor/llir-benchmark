@@ -106,21 +106,21 @@ TEZOS_PACKAGES=[
 CORE_PINNED=[
   ('zarith', '1.12+llir'),
   ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.9.0+llir'),
+  ('mirage-crypto', '0.10.2+llir'),
   ('nocrypto', '0.5.4-2+llir'),
   ('core', 'v0.14.1')
 ]
 MIRAGE_PINNED=[
   ('zarith', '1.12+llir'),
   ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.9.0+llir'),
+  ('mirage-crypto', '0.10.2+llir'),
   ('nocrypto', '0.5.4-2+llir'),
   ('core', 'v0.14.1')
 ]
 TEZOS_PINNED=[
   ('zarith', '1.12+llir'),
   ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.8.0+llir'),
+  ('mirage-crypto', '0.10.2+llir'),
   ('nocrypto', '0.5.4-2+llir'),
   ('core', 'v0.14.1')
 ]
