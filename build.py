@@ -5,6 +5,7 @@
 import os
 import subprocess
 import sys
+import packages
 
 
 
@@ -35,94 +36,14 @@ CONFIG = {
 # Enumeration of opt levels.
 OPT = ['O0', 'O1', 'O2', 'O3', 'O4', 'Os']
 
-# List of all packages to install.
-CORE_PACKAGES=[
-  "alcotest", "alt-ergo-free", "angstrom", "atdgen", "atdj", "atds", "base",
-  "base64", "bheap", "bigstringaf", "biniou", "bos", "camlp4", "camlp5",
-  "camlzip", "cmitomli", "compcert", "coq=8.13.0+llir", "cpdf", "cppo", "crowbar",
-  "csexp",
-  "cstruct", "cstruct-sexp", "cstruct-unix", "cubicle", "digestif", "diy",
-  "domain-name", "dune", "duration", "easy-format", "eqaf", "fix", "frama-c",
-  "fraplib", "gmp", "hevea", "hxd", "io-page", "ipaddr", "irmin-test",
-  "js_of_ocaml", "jsonm", "lru", "macaddr", "menhir",
-  "metrics-unix", "minilight", "nbcodec", "num", "ocaml-syntax-shims",
-  "ocamlformat", "ocamlgraph", "ocamlmod",
-  "odoc", "ounit2", "ptime", "randomconv", "re", "react", "reason", "result",
-  "rml", "sexplib", "sexplib0", "stdio", "stringext", "tyxml", "ucaml",  "uri",
-  "uucp",  "uuidm", "why3", "yojson", "zarith", "zlib", "irmin", "index",
-  "repr", "memtrace", "irmin-pack=2.5.3",
-  "ppx_deriving_yojson", "ppx_repr",
-  "ocplib-endian", "ocplib-simplex",
-  "lwt", "lwt-dllist", "hacl", "hacl-star", "sodium", "bentov"
-]
-
-# List of mirage-specific packages.
-MIRAGE_PACKAGES=[
-  "alcotest", "arp", "asn1-combinators", "astring", "benchmark", "bheap",
-  "bigarray-compat", "charrua", "charrua-server", "charrua-unix",
-  "conduit", "conduit-mirage", "conf-pkg-config", "cstruct", "crunch",
-  "cstruct-sexp", "cstruct-unix", "diet", "dns", "dns-client", "domain-name",
-  "dune", "dune-configurator", "duration", "eqaf", "ethernet", "fiat-p256",
-  "fmt", "functoria", "functoria-runtime", "hex", "hkdf", "io-page", "ipaddr",
-  "ipaddr-cstruct", "ipaddr-sexp", "ke", "libseccomp", "logs", "lru",
-  "lwt", "lwt-dllist", "lwt-canceler", "lwt-watcher", "lwt-exit",
-  "macaddr", "macaddr-cstruct", "macaddr-sexp", "magic-mime",
-  "mirage", "mirage-block", "mirage-block-unix", "mirage-bootvar-unix",
-  "mirage-channel", "mirage-clock", "mirage-clock-unix", "mirage-console",
-  "mirage-console-unix", "mirage-crypto", "mirage-device", "mirage-flow",
-  "mirage-fs", "mirage-kv", "mirage-kv-mem", "mirage-logs", "mirage-net",
-  "mirage-net-unix", "mirage-profile", "mirage-protocols", "mirage-random",
-  "mirage-random-test", "mirage-runtime", "mirage-stack", "mirage-time",
-  "mirage-time-unix", "mirage-types", "mirage-types-lwt", "mirage-vnetif",
-  "opam-depext", "ounit", "parse-argv", "pcap-format", "ptime",
-  "randomconv", "rresult", "sexplib", "shared-memory-ring",
-  "shared-memory-ring-lwt", "stdlib-shims", "solo5-bindings-hvt", "tcpip",
-  "tuntap", "vchan", "xenstore", "yojson", "gmp-freestanding",
-  "zarith-freestanding", "mirage-crypto-pk", "cohttp", "cohttp-mirage",
-  "dns", "irmin-pack", "irmin-mem", "memtrace", "react",
-  "irmin-layers",
-  "resto-directory", "resto-cohttp-server", "resto-cohttp-client",
-  "resto-cohttp-self-serving-client", "ocp-ocamlres",
-]
-
-# List of tezos-specific packages.
-TEZOS_PACKAGES=[
-  "irmin-layers", "irmin-pack=2.4.0", "result",
-  "resto-directory", "resto-cohttp-server", "resto-cohttp-client",
-  "resto-cohttp-self-serving-client", "ocp-ocamlres",
-  "hacl-star",
-  "ff=0.4.0",
-  "ppx_inline_test", "ppx_cstruct", "ppx_repr",
-  "data-encoding", "ezjsonm", "ringo", "secp256k1-internal",
-  "tar-unix", "camlzip", "rust",
-  "lwt-exit", "lwt-canceler", "lwt-watcher",  "lwt_log", "lwt-watcher",
-  "tls=0.11.1",
-  "librustzcash",
-  "sodium",
-  "ocaml-vec"
-]
-
 # Pinned packages.
-CORE_PINNED=[
+PINS=[
   ('zarith', '1.12+llir'),
   ('zarith-freestanding', '1.12+llir'),
   ('mirage-crypto', '0.10.2+llir'),
   ('nocrypto', '0.5.4-2+llir'),
-  ('core', 'v0.14.1')
-]
-MIRAGE_PINNED=[
-  ('zarith', '1.12+llir'),
-  ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.10.2+llir'),
-  ('nocrypto', '0.5.4-2+llir'),
-  ('core', 'v0.14.1')
-]
-TEZOS_PINNED=[
-  ('zarith', '1.12+llir'),
-  ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.10.2+llir'),
-  ('nocrypto', '0.5.4-2+llir'),
-  ('core', 'v0.14.1')
+  ('core', 'v0.14.1'),
+  ('conf-libssl', '3+llir')
 ]
 
 # Switches with root packages.
@@ -135,31 +56,31 @@ for arch, cpus in CPUS.items():
     f'ocaml-variants.4.11.1.master',
     f'arch-{arch}'
   ]
-  PACKAGES[f'{arch}+ref'] = CORE_PACKAGES
-  PINNED[f'{arch}+ref'] = CORE_PINNED
+  PACKAGES[f'{arch}+ref'] = packages.CORE_PACKAGES
+  PINNED[f'{arch}+ref'] = PINS
 
   SWITCHES[f'{arch}+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}'
   ]
-  PACKAGES[f'{arch}+llir'] = CORE_PACKAGES
-  PINNED[f'{arch}+llir'] = CORE_PINNED
+  PACKAGES[f'{arch}+llir'] = packages.CORE_PACKAGES
+  PINNED[f'{arch}+llir'] = PINS
 
   SWITCHES[f'{arch}+tezos+ref'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}',
     'rust'
   ]
-  PACKAGES[f'{arch}+tezos+ref'] = TEZOS_PACKAGES
-  PINNED[f'{arch}+tezos+ref'] = TEZOS_PINNED
+  PACKAGES[f'{arch}+tezos+ref'] = packages.TEZOS_PACKAGES
+  PINNED[f'{arch}+tezos+ref'] = PINS
 
   SWITCHES[f'{arch}+tezos+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}',
     'rust'
   ]
-  PACKAGES[f'{arch}+tezos+llir'] = TEZOS_PACKAGES
-  PINNED[f'{arch}+tezos+llir'] = TEZOS_PINNED
+  PACKAGES[f'{arch}+tezos+llir'] = packages.TEZOS_PACKAGES
+  PINNED[f'{arch}+tezos+llir'] = PINS
 
   for cfg, _ in CONFIG.items():
     SWITCHES[f'{arch}+ref+{cfg}'] = [
@@ -173,8 +94,8 @@ for arch, cpus in CPUS.items():
         f'arch-{arch}',
         f'llir-config.{opt}'
     ]
-    PACKAGES[f'{arch}+llir+{opt}'] = CORE_PACKAGES
-    PINNED[f'{arch}+llir+{opt}'] = CORE_PINNED
+    PACKAGES[f'{arch}+llir+{opt}'] = packages.CORE_PACKAGES
+    PINNED[f'{arch}+llir+{opt}'] = PINS
 
     SWITCHES[f'{arch}+tezos+llir+{opt}'] = [
         f'ocaml-variants.4.11.1.master+llir',
@@ -182,8 +103,8 @@ for arch, cpus in CPUS.items():
         f'llir-config.{opt}',
         'rust'
     ]
-    PACKAGES[f'{arch}+tezos+llir+{opt}'] = TEZOS_PACKAGES
-    PINNED[f'{arch}+tezos+llir+{opt}'] = TEZOS_PINNED
+    PACKAGES[f'{arch}+tezos+llir+{opt}'] = packages.TEZOS_PACKAGES
+    PINNED[f'{arch}+tezos+llir+{opt}'] = PINS
 
     for cpu in cpus:
       SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
@@ -191,8 +112,8 @@ for arch, cpus in CPUS.items():
           f'arch-{arch}',
           f'llir-config.{opt}'
       ]
-      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = CORE_PACKAGES
-      PINNED[f'{arch}+llir+{opt}+{cfg}'] = CORE_PINNED
+      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = packages.CORE_PACKAGES
+      PINNED[f'{arch}+llir+{opt}+{cfg}'] = PINS
 
     for cfg, _ in CONFIG.items():
       SWITCHES[f'{arch}+llir+{opt}+{cfg}'] = [
@@ -200,23 +121,23 @@ for arch, cpus in CPUS.items():
           f'arch-{arch}',
           f'llir-config.{opt}+{cfg}'
       ]
-      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = CORE_PACKAGES
-      PINNED[f'{arch}+llir+{opt}+{cfg}'] = CORE_PINNED
+      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = packages.CORE_PACKAGES
+      PINNED[f'{arch}+llir+{opt}+{cfg}'] = PINS
 
 for arch in ['amd64', 'arm64']:
   SWITCHES[f'{arch}+mirage+ref'] = [
     f'ocaml-variants.4.11.1.master',
     f'arch-{arch}',
   ]
-  PACKAGES[f'{arch}+mirage+ref'] = MIRAGE_PACKAGES
-  PINNED[f'{arch}+mirage+ref'] = MIRAGE_PINNED
+  PACKAGES[f'{arch}+mirage+ref'] = packages.MIRAGE_PACKAGES
+  PINNED[f'{arch}+mirage+ref'] = PINS
 
   SWITCHES[f'{arch}+mirage+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}',
   ]
-  PACKAGES[f'{arch}+mirage+llir'] = MIRAGE_PACKAGES
-  PINNED[f'{arch}+mirage+llir'] = MIRAGE_PINNED
+  PACKAGES[f'{arch}+mirage+llir'] = packages.MIRAGE_PACKAGES
+  PINNED[f'{arch}+mirage+llir'] = PINS
 
   for opt in OPT:
     SWITCHES[f'{arch}+mirage+llir+{opt}'] = [
@@ -224,8 +145,8 @@ for arch in ['amd64', 'arm64']:
       f'arch-{arch}',
       f'llir-config.{opt}'
     ]
-    PACKAGES[f'{arch}+mirage+llir+{opt}'] = MIRAGE_PACKAGES
-    PINNED[f'{arch}+mirage+llir+{opt}'] = MIRAGE_PINNED
+    PACKAGES[f'{arch}+mirage+llir+{opt}'] = packages.MIRAGE_PACKAGES
+    PINNED[f'{arch}+mirage+llir+{opt}'] = PINS
 
 
 
