@@ -117,7 +117,6 @@ MIRAGE_PACKAGES=[
   "mirage-crypto=0.10.2+llir",
   "mirage-crypto-ec=0.10.2+llir",
   "mirage-crypto-pk=0.10.2+llir",
-  "mirage-crypto-rng=0.10.2+llir",
   "mirage-crypto-rng-mirage=0.10.2+llir",
   "mirage-device=2.0.0",
   "mirage-flow=2.0.1",
@@ -232,6 +231,7 @@ MIRAGE_PACKAGES=[
   "lwt-exit=1.0",
   #"x509=0.11.2",
   #"ocamlgraph=2.0.0+llir",
+  #"mirage-crypto-rng=0.10.2+llir",
 ]
 
 # List of all packages to install.
@@ -459,7 +459,6 @@ TEZOS_PACKAGES=[
   "cstruct-lwt=6.0.1",
   "cstruct-sexp=6.0.1",
   "cstruct-unix=6.0.1",
-  "ctypes=0.17.1",
   "ctypes-foreign=0.18.0",
   "data-encoding=0.4",
   "digestif=1.0.0+llir",
@@ -508,7 +507,6 @@ TEZOS_PACKAGES=[
   "metrics-unix=0.3.0",
   "mirage-crypto=0.10.2+llir",
   "mirage-crypto-pk=0.10.2+llir",
-  "mirage-crypto-rng=0.10.2+llir",
   "mirage-no-solo5=1",
   "mirage-no-xen=1",
   "mmap=1.1.0",
@@ -587,7 +585,9 @@ TEZOS_PACKAGES=[
   "zarith=1.12+llir",
   "zlib=1.2.9+llir",
   "ocaml-vec"
+  #"mirage-crypto-rng=0.10.2+llir",
   #"x509=0.11.2",
   #"bigstring=0.3",
   #"fiat-p256=0.2.3",
+  #"ctypes=0.17.1",
 ]
