@@ -43,7 +43,9 @@ PINS=[
   ('mirage-crypto', '0.10.2+llir'),
   ('nocrypto', '0.5.4-2+llir'),
   ('core', 'v0.14.1'),
-  ('conf-libssl', '3+llir')
+  ('conf-libssl', '3+llir'),
+  ('sodium', '0.6.0+llir'),
+  ('conf-rust', '0.1+llir'),
 ]
 
 # Switches with root packages.
