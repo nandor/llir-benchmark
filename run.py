@@ -152,15 +152,17 @@ def benchmark_micro(benchmarks, switches, output):
   """Runs microbenchmarks."""
 
   perf = defaultdict(dict)
-  all_tests = list(itertools.product(benchmarks, switches))
-  for bench, switch in tqdm.tqdm(all_tests):
-    for test in bench.tests:
-      micro_dir = os.path.abspath(os.path.join(output, os.pardir, 'log'))
-      bench_log = os.path.join(micro_dir, '{}.{}'.format(test.name, switch))
-      if not os.path.exists(micro_dir):
-        os.makedirs(micro_dir)
+  all_tests = list(itertools.product(
+      itertools.chain.from_iterable(b.tests for b in benchmarks),
+      switches
+  ))
+  for test, switch in tqdm.tqdm(all_tests):
+    micro_dir = os.path.abspath(os.path.join(output, os.pardir, 'log'))
+    bench_log = os.path.join(micro_dir, '{}.{}'.format(test.name, switch))
+    if not os.path.exists(micro_dir):
+      os.makedirs(micro_dir)
 
-    result = _run_micro_test(bench.exe.format(switch))
+    result = _run_micro_test(test.exe.format(switch))
     with open(bench_log, 'w') as f:
       f.write(result)
 
