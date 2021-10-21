@@ -36,22 +36,9 @@ CONFIG = {
 # Enumeration of opt levels.
 OPT = ['O0', 'O1', 'O2', 'O3', 'O4', 'Os']
 
-# Pinned packages.
-PINS=[
-  ('zarith', '1.12+llir'),
-  ('zarith-freestanding', '1.12+llir'),
-  ('mirage-crypto', '0.10.2+llir'),
-  ('nocrypto', '0.5.4-2+llir'),
-  ('core', 'v0.14.1'),
-  ('conf-libssl', '3+llir'),
-  ('sodium', '0.6.0+llir'),
-  ('conf-rust', '0.1+llir'),
-]
-
 # Switches with root packages.
 SWITCHES = {}
 PACKAGES = {}
-PINNED = {}
 
 for arch, cpus in CPUS.items():
   SWITCHES[f'{arch}+ref'] = [
@@ -59,14 +46,12 @@ for arch, cpus in CPUS.items():
     f'arch-{arch}'
   ]
   PACKAGES[f'{arch}+ref'] = packages.CORE_PACKAGES
-  PINNED[f'{arch}+ref'] = PINS
 
   SWITCHES[f'{arch}+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}'
   ]
   PACKAGES[f'{arch}+llir'] = packages.CORE_PACKAGES
-  PINNED[f'{arch}+llir'] = PINS
 
   SWITCHES[f'{arch}+tezos+ref'] = [
     f'ocaml-variants.4.11.1.master+llir',
@@ -74,7 +59,6 @@ for arch, cpus in CPUS.items():
     'rust'
   ]
   PACKAGES[f'{arch}+tezos+ref'] = packages.TEZOS_PACKAGES
-  PINNED[f'{arch}+tezos+ref'] = PINS
 
   SWITCHES[f'{arch}+tezos+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
@@ -82,7 +66,6 @@ for arch, cpus in CPUS.items():
     'rust'
   ]
   PACKAGES[f'{arch}+tezos+llir'] = packages.TEZOS_PACKAGES
-  PINNED[f'{arch}+tezos+llir'] = PINS
 
   for cfg, _ in CONFIG.items():
     SWITCHES[f'{arch}+ref+{cfg}'] = [
@@ -97,7 +80,6 @@ for arch, cpus in CPUS.items():
         f'llir-config.{opt}'
     ]
     PACKAGES[f'{arch}+llir+{opt}'] = packages.CORE_PACKAGES
-    PINNED[f'{arch}+llir+{opt}'] = PINS
 
     SWITCHES[f'{arch}+tezos+llir+{opt}'] = [
         f'ocaml-variants.4.11.1.master+llir',
@@ -106,7 +88,6 @@ for arch, cpus in CPUS.items():
         'rust'
     ]
     PACKAGES[f'{arch}+tezos+llir+{opt}'] = packages.TEZOS_PACKAGES
-    PINNED[f'{arch}+tezos+llir+{opt}'] = PINS
 
     for cpu in cpus:
       SWITCHES[f'{arch}+llir+{opt}+{cpu}'] = [
@@ -115,7 +96,6 @@ for arch, cpus in CPUS.items():
           f'llir-config.{opt}'
       ]
       PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = packages.CORE_PACKAGES
-      PINNED[f'{arch}+llir+{opt}+{cfg}'] = PINS
 
     for cfg, _ in CONFIG.items():
       SWITCHES[f'{arch}+llir+{opt}+{cfg}'] = [
@@ -124,7 +104,6 @@ for arch, cpus in CPUS.items():
           f'llir-config.{opt}+{cfg}'
       ]
       PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = packages.CORE_PACKAGES
-      PINNED[f'{arch}+llir+{opt}+{cfg}'] = PINS
 
 for arch in ['amd64', 'arm64']:
   SWITCHES[f'{arch}+mirage+ref'] = [
@@ -132,14 +111,12 @@ for arch in ['amd64', 'arm64']:
     f'arch-{arch}',
   ]
   PACKAGES[f'{arch}+mirage+ref'] = packages.MIRAGE_PACKAGES
-  PINNED[f'{arch}+mirage+ref'] = PINS
 
   SWITCHES[f'{arch}+mirage+llir'] = [
     f'ocaml-variants.4.11.1.master+llir',
     f'arch-{arch}',
   ]
   PACKAGES[f'{arch}+mirage+llir'] = packages.MIRAGE_PACKAGES
-  PINNED[f'{arch}+mirage+llir'] = PINS
 
   for opt in OPT:
     SWITCHES[f'{arch}+mirage+llir+{opt}'] = [
@@ -148,7 +125,6 @@ for arch in ['amd64', 'arm64']:
       f'llir-config.{opt}'
     ]
     PACKAGES[f'{arch}+mirage+llir+{opt}'] = packages.MIRAGE_PACKAGES
-    PINNED[f'{arch}+mirage+llir+{opt}'] = PINS
 
 
 
@@ -270,18 +246,6 @@ def install(switches, repository, jb, test, apps):
           )
       ])
   opam(['update'])
-
-  # Pin LLIR packages.
-  for switch in switches:
-    for pkg, version in PINNED[switch]:
-      opam([
-          'pin',
-          'add',
-          pkg,
-          version,
-          '--switch={}'.format(switch),
-          '--no-action'
-      ])
 
   # Install the compilers.
   for switch in switches:
