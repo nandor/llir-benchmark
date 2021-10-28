@@ -271,6 +271,9 @@ def install(switches, repository, jb, test, apps):
             prefix=os.path.join(OPAMROOT, switch)
         )
 
+  for switch in switches:
+    opam(['clean', '--switch', switch])
+
 
 def build(switches, jb, macro, micro):
   """Build all benchmarks."""
