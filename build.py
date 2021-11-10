@@ -95,7 +95,7 @@ for arch, cpus in CPUS.items():
           f'arch-{arch}',
           f'llir-config.{opt}'
       ]
-      PACKAGES[f'{arch}+llir+{opt}+{cfg}'] = packages.CORE_PACKAGES
+      PACKAGES[f'{arch}+llir+{opt}+{cpu}'] = packages.CORE_PACKAGES
 
     for cfg, _ in CONFIG.items():
       SWITCHES[f'{arch}+llir+{opt}+{cfg}'] = [
